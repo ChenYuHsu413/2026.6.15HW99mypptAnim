@@ -234,6 +234,10 @@ def should_merge(a, b, raw=None):
     # outlined letters (chevron glyphs) of that size must stay separate.
     word_gap = max(48, 1.1 * min_h)  # spacing scales with the font size
     if max_h < 220 and min_h < 160 and gap_x < word_gap and overlap_y > 0.6 * min_h:
+        # Very small gaps on the same baseline are usually a sentence split
+        # across two detected pieces, not separate layout columns.
+        if gap_x <= 20 and overlap_y > 0.7 * min_h:
+            return True
         if min_h >= 130 and raw is not None:
             def density(box):
                 x, y, w, h = box
