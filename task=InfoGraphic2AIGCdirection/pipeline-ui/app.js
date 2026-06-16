@@ -170,8 +170,8 @@ document.querySelectorAll('.asset-tab').forEach(b=>{b.addEventListener('click',(
 showSkipped.addEventListener('change',e=>{S.showSkipped=e.target.checked;if(S.selected)renderPreview(S.selected,(S.meta.get(S.selected.slide)||S.selected).layers||[]);});
 
 // ── Render dialog ───────────────────────────────────────────────────
-renderBtn.addEventListener('click',()=>{renderDialog.hidden=false;});
-renderClose.addEventListener('click',()=>{renderDialog.hidden=true;});
+renderBtn.addEventListener('click',()=>{renderDialog.classList.add('show');});
+renderClose.addEventListener('click',()=>{renderDialog.classList.remove('show');});
 renderGo.addEventListener('click',async()=>{
   renderGo.disabled=true;renderLog.textContent='Starting render…';
   try{
