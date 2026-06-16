@@ -88,6 +88,7 @@ function layerOverride(slideNum, layerName) {
 function markDirty() {
   state.dirty = true;
   saveBtn.disabled = false;
+  applyBtn.disabled = false;
   saveBtn.textContent = 'Save overrides';
 }
 
@@ -147,7 +148,9 @@ async function loadTask(taskPath) {
   state.overrides = {};
   state.dirty = false;
   saveBtn.disabled = true;
+  applyBtn.disabled = true;
   saveBtn.textContent = 'Save overrides';
+  pipelineLog.textContent = 'Apply edits and click "Apply to pipeline" to execute.';
 
   try {
     const saved = await fetchJson(`${root}pipeline_state.json`);
@@ -158,6 +161,8 @@ async function loadTask(taskPath) {
   selectSlide(state.slides[0]?.slide);
   statusEl.textContent = `${state.slides.length} slides loaded from ${taskPath}.`;
   saveBtn.disabled = !state.dirty;
+  applyBtn.disabled = !state.dirty;
+  applyBtn.disabled = !state.dirty;
 }
 
 async function init() {
@@ -431,6 +436,7 @@ saveBtn.addEventListener('click', () => {
   URL.revokeObjectURL(a.href);
   state.dirty = false;
   saveBtn.disabled = true;
+  applyBtn.disabled = false; // overrides still in memory, user can still apply
   saveBtn.textContent = 'Saved ✓';
 });
 
