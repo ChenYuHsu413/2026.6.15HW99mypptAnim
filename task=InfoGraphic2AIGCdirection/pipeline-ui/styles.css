@@ -47,7 +47,7 @@ button,input,select { font:inherit }
 .slide-btn strong { display:block; margin-bottom:3px }
 .slide-btn span { color:var(--muted); font-size:11px }
 
-.viewer { display:grid; grid-template-rows:auto auto 1fr auto; gap:10px; min-width:0 }
+.viewer { display:grid; grid-template-rows:auto auto 1fr auto auto; gap:10px; min-width:0 }
 .viewer-header { display:flex; align-items:center; justify-content:space-between; gap:12px }
 .viewer-actions { display:flex; align-items:center; gap:8px }
 .play-btn { border:1px solid var(--ok); border-radius:8px; padding:7px 12px; color:#0a1a0f; background:var(--ok); font-weight:700; font-size:12px; cursor:pointer; white-space:nowrap }
@@ -91,7 +91,8 @@ button,input,select { font:inherit }
 .stats dd { margin:0; font-weight:700 }
 .narration { color:#d6e3f3; font-size:13px; line-height:1.5; margin:0 0 8px }
 audio { width:100% }
-.notes-input { width:100%; min-height:50px; border:1px solid var(--line); border-radius:8px; padding:6px 8px; color:var(--text); background:var(--panel2); font-size:12px; font-family:inherit; resize:vertical }
+.notes-input { width:100%; min-height:44px; max-height:80px; border:1px solid var(--line); border-radius:8px; padding:6px 8px; color:var(--text); background:var(--panel2); font-size:12px; font-family:inherit; resize:vertical }
+.notes-section { padding:0 2px }
 .dialog { position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; place-items:center; z-index:999 }
 .dialog.show { display:grid }
 .dialog-card { border:1px solid var(--line); border-radius:14px; padding:20px; background:var(--panel); min-width:360px; max-width:440px }
