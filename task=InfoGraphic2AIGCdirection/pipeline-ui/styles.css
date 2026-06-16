@@ -91,6 +91,18 @@ button, input { font: inherit; }
 }
 .save-btn:disabled { opacity: .4; cursor: default; }
 
+.apply-btn {
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 9px 14px;
+  color: #08111c;
+  background: var(--accent);
+  font-weight: 700;
+  cursor: pointer;
+}
+.apply-btn:disabled { opacity: .4; cursor: default; }
+.apply-btn.running { opacity: .6; pointer-events: none; }
+
 .app-shell {
   display: grid;
   grid-template-columns: 250px minmax(560px, 1fr) 390px;
@@ -408,6 +420,18 @@ audio { width: 100%; }
   gap: 4px 10px;
   color: var(--muted);
   font-size: 12px;
+}
+
+.log-card { min-height: 80px; }
+.log-output {
+  margin: 0;
+  color: var(--ok);
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 200px;
+  overflow: auto;
 }
 
 .load-error {

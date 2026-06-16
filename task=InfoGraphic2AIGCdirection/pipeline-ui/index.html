@@ -18,6 +18,7 @@
         <select id="taskSelect"></select>
       </label>
       <button id="saveBtn" class="save-btn" disabled>Save overrides</button>
+      <button id="applyBtn" class="apply-btn" disabled>Apply to pipeline</button>
       <div class="status" id="status">Loading project...</div>
     </div>
   </header>
@@ -74,6 +75,10 @@
       <section class="card layers-card">
         <div class="panel-title">Layers</div>
         <div id="layerList" class="layer-list"></div>
+      </section>
+      <section class="card log-card">
+        <div class="panel-title">Pipeline log</div>
+        <pre id="pipelineLog" class="log-output">Apply edits and click "Apply to pipeline" to execute.</pre>
       </section>
     </aside>
   </main>

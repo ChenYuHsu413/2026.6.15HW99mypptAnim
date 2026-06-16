@@ -113,7 +113,7 @@ python -m http.server 8000
 - `pipeline-ui/app.js`：改為從 `task-index.json` 載入 task 列表，下拉切換 task 時重新載入 slides/layers/timing
 - `pipeline-ui/index.html`、`styles.css`：加入 topbar 下拉選單樣式
 
-使用方式：
+ 使用方式：
 
 ```bash
 python -m http.server 8000
@@ -122,3 +122,36 @@ python -m http.server 8000
 ```
 
 驗證：`node --check task=InfoGraphic2AIGCdirection/pipeline-ui/app.js`
+
+---
+
+## 2026-06-16：Phase II 補完 — Pipeline Server + 中英混用旁白
+
+變更內容：
+
+- `pipeline_server.py`：新增 pipeline action server
+  - POST `/apply` 接收 `pipeline_state.json` overrides
+  - 自動更新 `narration_script.md` → 重跑 TTS → patch metadata → 重建 timeline
+  - CORS 支援，預設埠 8001
+- `pipeline-ui/app.js`：加入 Apply to pipeline 按鈕
+  - 將 `state.overrides` POST 到 pipeline server
+  - 顯示 server 回傳的 logs
+- `pipeline-ui/index.html`、`styles.css`：加入 apply-btn、log panel
+- `narration/narration_script.md`：改為中英混用版
+- 重跑 TTS（`zh-TW-YunJheNeural` 男聲）+ 重建 timeline
+
+使用方式：
+
+```bash
+# 終端 1：靜態檔案伺服器
+cd /project/root
+python -m http.server 8000
+
+# 終端 2：Pipeline action server
+cd task=InfoGraphic2AIGCdirection
+python pipeline_server.py 8001
+
+# 瀏覽器
+# http://localhost:8000/task=InfoGraphic2AIGCdirection/pipeline-ui/
+# 編輯 → Save overrides → Apply to pipeline
+```

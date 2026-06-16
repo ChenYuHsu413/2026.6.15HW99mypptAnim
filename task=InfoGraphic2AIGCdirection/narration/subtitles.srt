@@ -1,39 +1,239 @@
 1
-00:00:00,000 --> 00:00:17,220
-We are moving from narrow AI to general AI, and that changes how we think about work itself. In this deck, you will see two complementary paths: vibe coding and workflow automation. Together, they point toward a future where humans guide systems, not just operate tools.
+00:00:00,000 --> 00:00:04,036
+我們正在從 narrow AI 走向 general AI，
 
 2
-00:00:18,070 --> 00:00:35,980
-The old model was a single task: you asked, you executed, and you repeated. The new model is a loop of understanding, decomposing, using tools, checking results, and finishing the job. That shift is what makes AI useful for real work, not just isolated prompts.
+00:00:04,036 --> 00:00:06,323
+這從根本上改變了我們對工作的理解。
 
 3
-00:00:36,830 --> 00:00:54,670
-Vibe coding replaces manual coding and interface tweaking with natural language instructions. Instead of editing every detail yourself, you describe the intent and let AI translate that intent into execution. This makes the operator more like a creative director than a hands-on mechanic.
+00:00:06,323 --> 00:00:08,879
+這份 deck 會介紹兩條互補的路徑：
 
 4
-00:00:55,520 --> 00:01:12,520
-On the left, the traditional operator is trapped inside a messy, fixed environment. On the right, the director shapes the outcome by guiding design, programming, content, and analysis. The key change is not just speed, but a new kind of control over the work.
+00:00:08,879 --> 00:00:13,453
+vibe coding 和 workflow automation。
 
 5
-00:01:13,370 --> 00:01:32,940
-Workflow automation is about completing the whole job, step by step, with almost no human intervention until final quality control. Instead of copying text or manually pasting between tools, the system handles a structured flow from input to output. That is how complex, multi-stage work becomes repeatable.
+00:00:13,453 --> 00:00:17,220
+兩者結合，指向一個人類引導系統、而不只是操作工具的未來。
 
 6
-00:01:33,790 --> 00:01:54,560
-This slide shows a full production pipeline, from PDF to summary lines, script, storyboard, microphone, subtitles, and final review. The point is that AI can now coordinate an end-to-end process, not just generate a single answer. In practical terms, it can help create polished educational videos with far less manual glue work.
+00:00:18,070 --> 00:00:21,158
+過去的模式是單一任務：你下指令、它執行、你再重複。
 
 7
-00:01:55,410 --> 00:02:12,530
-The two paths answer different questions. Vibe coding asks, “How do I use this tool?” while workflow automation asks, “How does the entire job get done?” One changes the human role from operator to director, and the other changes the human role from user to flow designer.
+00:00:21,158 --> 00:00:24,369
+現在的新模式是一個循環：understanding、
 
 8
-00:02:13,380 --> 00:02:30,310
-The real future is not choosing between these two ideas, but combining them. Vibe coding handles the individual steps, while workflow automation structures the sequence around them. Put together, they form a true AI system that can execute, coordinate, and improve.
+00:00:24,369 --> 00:00:27,334
+decomposing、using tools、
 
 9
-00:02:31,160 --> 00:02:52,790
-Building that system starts with a clear blueprint: find a real scenario, analyze the current flow, identify AI opportunities, design the interaction, design the workflow, build a prototype, test and iterate, then present and reflect. Each step makes the system more real and more usable. That is how an AI user becomes an AI workflow designer.
+00:00:27,334 --> 00:00:30,298
+checking results，最後完成任務。
 
 10
-00:02:53,640 --> 00:03:12,870
-The next generation of work needs new core skills: professional expression, prompt design, task deconstruction, workflow design, and quality control. These are the abilities that let people steer AI with clarity and confidence. The goal is no longer just using AI well, but designing systems that work well.
+00:00:30,298 --> 00:00:32,892
+這個轉變讓 AI 真正能被用在實際工作上，
+
+11
+00:00:32,892 --> 00:00:35,980
+而不只是寫一些 isolated prompts。
+
+12
+00:00:36,830 --> 00:00:41,862
+Vibe coding 的核心是用自然語言取代手動編碼和介面調整。
+
+13
+00:00:41,862 --> 00:00:45,216
+你不用自己編輯每一個細節，而是描述你的意圖，
+
+14
+00:00:45,216 --> 00:00:47,351
+讓 AI 把意圖轉換成執行。
+
+15
+00:00:47,351 --> 00:00:51,315
+這讓操作者更像 creative director，
+
+16
+00:00:51,315 --> 00:00:54,670
+而不是 hands-on mechanic。
+
+17
+00:00:55,520 --> 00:00:59,315
+左邊是傳統的操作者，被困在一個雜亂、固定的環境裡。
+
+18
+00:00:59,315 --> 00:01:03,109
+右邊是 director，透過引導 design、
+
+19
+00:01:03,109 --> 00:01:04,931
+programming、
+
+20
+00:01:04,931 --> 00:01:08,725
+content 和 analysis 來塑造結果。
+
+21
+00:01:08,725 --> 00:01:12,520
+關鍵改變不只是速度，而是對工作的一種全新掌控方式。
+
+22
+00:01:13,370 --> 00:01:19,775
+Workflow automation 的目標是用幾乎零人工干預的方式，
+
+23
+00:01:19,775 --> 00:01:25,290
+一步步完成整個工作流程 — 從 input 到 output，
+
+24
+00:01:25,290 --> 00:01:27,959
+不需要複製貼上或手動切換工具。
+
+25
+00:01:27,959 --> 00:01:32,940
+這就是為什麼複雜、多階段的任務可以變得可重複、可規模化。
+
+26
+00:01:33,790 --> 00:01:38,224
+這張 slide 展示了一條完整的 production pipeline：
+
+27
+00:01:38,224 --> 00:01:41,375
+從 PDF 開始，經過 summary、script、
+
+28
+00:01:41,375 --> 00:01:44,992
+storyboard、microphone、subtitle，
+
+29
+00:01:44,992 --> 00:01:46,742
+到 final review。
+
+30
+00:01:46,742 --> 00:01:50,126
+重點是，AI 現在可以協調 end-to-end 的流程，
+
+31
+00:01:50,126 --> 00:01:51,409
+而不只是生成單一答案。
+
+32
+00:01:51,409 --> 00:01:54,560
+它可以用來製作完整的教學影片，省去大量手動串接的工作。
+
+33
+00:01:55,410 --> 00:01:57,326
+這兩條路徑回答的是不同的問題。
+
+34
+00:01:57,326 --> 00:02:00,520
+Vibe coding 問的是「我怎麼用這個工具？
+
+35
+00:02:00,520 --> 00:02:00,776
+」；
+
+36
+00:02:00,776 --> 00:02:05,248
+workflow automation 問的是「整個工作要怎麼被完成？
+
+37
+00:02:05,248 --> 00:02:05,503
+」。
+
+38
+00:02:05,503 --> 00:02:09,080
+一條把人類從 operator 變成 director，
+
+39
+00:02:09,080 --> 00:02:12,530
+另一條從 user 變成 flow designer。
+
+40
+00:02:13,380 --> 00:02:16,907
+真正的未來不是在兩者之間選擇，而是把它們結合起來。
+
+41
+00:02:16,907 --> 00:02:20,011
+Vibe coding 處理單一步驟的執行，
+
+42
+00:02:20,011 --> 00:02:24,385
+workflow automation 把步驟串成完整的序列。
+
+43
+00:02:24,385 --> 00:02:28,899
+兩者加在一起，就形成了一個真正的 AI system，能夠執行、
+
+44
+00:02:28,899 --> 00:02:30,310
+協調、並且持續改善。
+
+45
+00:02:31,160 --> 00:02:34,155
+要建立這樣的系統，需要一張清晰的 blueprint：
+
+46
+00:02:34,155 --> 00:02:36,817
+先找到真實場景、分析現有流程、找出 AI 機會、
+
+47
+00:02:36,817 --> 00:02:39,701
+設計 interaction 和 workflow、
+
+48
+00:02:39,701 --> 00:02:41,809
+接著 build prototype、
+
+49
+00:02:41,809 --> 00:02:43,694
+test and iterate，
+
+50
+00:02:43,694 --> 00:02:46,246
+最後 present and reflect。
+
+51
+00:02:46,246 --> 00:02:48,131
+每一步都讓系統變得更真實、更可用。
+
+52
+00:02:48,131 --> 00:02:52,790
+這就是從 AI user 成長為 AI workflow designer 的路徑。
+
+53
+00:02:53,640 --> 00:02:55,600
+下一世代的工作需要新的核心技能：
+
+54
+00:02:55,600 --> 00:02:58,539
+professional expression、
+
+55
+00:02:58,539 --> 00:03:00,254
+prompt design、
+
+56
+00:03:00,254 --> 00:03:02,704
+task deconstruction、
+
+57
+00:03:02,704 --> 00:03:04,664
+workflow design，
+
+58
+00:03:04,664 --> 00:03:06,991
+還有 quality control。
+
+59
+00:03:06,991 --> 00:03:09,563
+這些能力讓人們能夠清晰且自信地引導 AI。
+
+60
+00:03:09,563 --> 00:03:12,870
+目標不再只是把 AI 用得好，而是設計出好的工作系統。

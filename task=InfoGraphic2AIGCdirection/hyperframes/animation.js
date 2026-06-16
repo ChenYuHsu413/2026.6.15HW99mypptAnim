@@ -25,7 +25,6 @@ function showSlide(slide, timing) {
   base.src = `../output/slide_${pad(slide.slide)}/background.png`;
   slideRoot.appendChild(base);
   for (const layer of slide.layers) {
-    if (layer.type === 'key_point_card') continue;
     const img = document.createElement('img');
     img.className = `layer ${layer.animation}`;
     img.src = `../output/slide_${pad(slide.slide)}/${layer.name}`;

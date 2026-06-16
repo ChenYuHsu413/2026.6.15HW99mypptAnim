@@ -16,6 +16,8 @@ const state = {
 const projectRoot = new URL('../../', window.location.href).href;
 const taskSelect = document.getElementById('taskSelect');
 const saveBtn = document.getElementById('saveBtn');
+const applyBtn = document.getElementById('applyBtn');
+const pipelineLog = document.getElementById('pipelineLog');
 const slideList = document.getElementById('slideList');
 const statusEl = document.getElementById('status');
 const selectedSlideLabel = document.getElementById('selectedSlideLabel');
@@ -369,6 +371,34 @@ saveBtn.addEventListener('click', () => {
   state.dirty = false;
   saveBtn.disabled = true;
   saveBtn.textContent = 'Saved ✓';
+});
+
+applyBtn.addEventListener('click', async () => {
+  const payload = JSON.stringify(state.overrides);
+  applyBtn.disabled = true;
+  applyBtn.classList.add('running');
+  applyBtn.textContent = 'Running…';
+  pipelineLog.textContent = 'Sending overrides to pipeline server…\n';
+
+  try {
+    const res = await fetch('http://localhost:8001/apply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: payload,
+    });
+    const data = await res.json();
+    if (data.status === 'ok') {
+      pipelineLog.textContent = (data.logs || []).join('\n') + '\n\n✓ Pipeline applied successfully.';
+    } else {
+      pipelineLog.textContent = `Error: ${data.message || 'unknown'}`;
+    }
+  } catch (err) {
+    pipelineLog.textContent = `Failed to connect to pipeline server.\n\nStart it in the task directory:\n  python pipeline_server.py\n\nError: ${err.message}`;
+  } finally {
+    applyBtn.disabled = false;
+    applyBtn.classList.remove('running');
+    applyBtn.textContent = 'Apply to pipeline';
+  }
 });
 
 document.querySelectorAll('.asset-tab').forEach(btn => {
