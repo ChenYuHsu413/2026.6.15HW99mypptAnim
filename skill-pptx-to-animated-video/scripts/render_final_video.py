@@ -73,107 +73,14 @@ def load_slides():
         bg = cv2.cvtColor(np.array(Image.open(d / "background.png").convert("RGB")), cv2.COLOR_RGB2BGR)
         layers = []
         for layer in meta["layers"]:
+            if layer.get("type") == "key_point_card":
+                continue
             rgba = np.array(Image.open(d / layer["name"]).convert("RGBA"))
             bgr = cv2.cvtColor(rgba[:, :, :3], cv2.COLOR_RGB2BGR)
             alpha = rgba[:, :, 3].astype(np.float32) / 255.0
             layers.append({"meta": layer, "bgr": bgr, "alpha": alpha})
         slides.append({"meta": meta, "bg": bg, "layers": layers})
     return slides
-
-
-def keywords_for_slide(slide_num):
-    return {
-        1: ["Narrow AI", "General AI", "Vibe Coding", "Workflow Automation"],
-        2: ["Single Task", "Multi-step", "Tools", "Quality Control"],
-        3: ["Manual Coding", "Natural Language", "Execution", "Director"],
-        4: ["Operator", "Director", "Design", "Analysis"],
-        5: ["Workflow Automation", "Input", "Split Tasks", "Output"],
-        6: ["PDF", "Storyboard", "Microphone", "Subtitle", "AI Check"],
-        7: ["Operator → Director", "User → Flow Designer"],
-        8: ["Vibe Coding", "Workflow Automation", "Ultimate AI System"],
-        9: ["Blueprint", "Prototype", "Test & Iterate", "Workflow Design"],
-        10: ["Prompt Design", "Task Deconstruction", "Workflow Design", "Quality Control"],
-    }.get(slide_num, [])
-
-
-def make_keyword_timeline(slide_num, timing, slide_duration):
-    keywords = keywords_for_slide(slide_num)
-    if not keywords:
-        return []
-    cue_times = [c["time"] for c in timing.get("cues", []) if c.get("spoken_content") != "title"]
-    if len(cue_times) < len(keywords):
-        start = timing["start"]
-        end = timing["end"]
-        span = max(0.5, end - start - 0.5)
-        cue_times = [round(start + span * (i + 1) / (len(keywords) + 1), 2) for i in range(len(keywords))]
-    return list(zip(keywords, cue_times[: len(keywords)]))
-
-
-def draw_chips(frame, slide_num, t, timing):
-    plan = make_keyword_timeline(slide_num, timing, timing["end"] - timing["start"])
-    if not plan:
-        return
-    active = []
-    for text, start in plan:
-        age = t + timing["start"] - start
-        if age < -0.05 or age > 1.9:
-            continue
-        if age < 0.35:
-            alpha = age / 0.35
-        elif age > 1.55:
-            alpha = max(0.0, (1.9 - age) / 0.35)
-        else:
-            alpha = 1.0
-        active.append((text, alpha))
-    if not active:
-        return
-    # Bottom-center stack, wrapping to two rows when needed.
-    max_w = 1640
-    pad_x, pad_y = 28, 16
-    gap = 18
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    font_scale = 1.05
-    thickness = 3
-    metrics = []
-    for text, alpha in active:
-        (tw, th), baseline = cv2.getTextSize(text, font, font_scale, thickness)
-        metrics.append((text, alpha, tw + pad_x * 2, th + pad_y * 2, baseline))
-    rows = []
-    cur = []
-    cur_w = 0
-    for item in metrics:
-        need = item[2] + (gap if cur else 0)
-        if cur and cur_w + need > max_w:
-            rows.append(cur)
-            cur = [item]
-            cur_w = item[2]
-        else:
-            cur.append(item)
-            cur_w += need
-    if cur:
-        rows.append(cur)
-    total_h = sum(max(i[3] for i in row) for row in rows) + gap * (len(rows) - 1)
-    y = HEIGHT - 185 - total_h
-    for row in rows:
-        row_h = max(i[3] for i in row)
-        row_w = sum(i[2] for i in row) + gap * (len(row) - 1)
-        x = (WIDTH - row_w) // 2
-        for text, alpha, w, h, baseline in row:
-            overlay = frame.copy()
-            color = (72, 58, 16)
-            fill = (252, 231, 120)
-            rect = (x, y, x + w, y + h)
-            cv2.rectangle(overlay, (rect[0], rect[1]), (rect[2], rect[3]), fill, -1, cv2.LINE_AA)
-            cv2.rectangle(overlay, (rect[0], rect[1]), (rect[2], rect[3]), color, 3, cv2.LINE_AA)
-            radius = 18
-            for cx, cy in [(rect[0] + radius, rect[1] + radius), (rect[2] - radius, rect[1] + radius), (rect[0] + radius, rect[3] - radius), (rect[2] - radius, rect[3] - radius)]:
-                cv2.circle(overlay, (cx, cy), radius, fill, -1, cv2.LINE_AA)
-            tx = x + pad_x
-            ty = y + pad_y + h - baseline - 8
-            cv2.putText(overlay, text, (tx, ty), font, font_scale, (30, 30, 30), thickness, cv2.LINE_AA)
-            cv2.addWeighted(overlay, alpha * 0.95, frame, 1 - alpha * 0.95, 0, frame)
-            x += w + gap
-        y += row_h + gap
 
 
 def paste(frame, bgr, alpha, x, y, opacity=1.0):
@@ -314,7 +221,6 @@ def main():
     for n, key in enumerate(keys):
         info = timing[key]
         slide = slides[n]
-        slide_num = slide["meta"]["slide"]
         cache = {"settled": slide["bg"].copy(), "settled_n": 0}
         start_f = int(round(info["start"] * FPS))
         end_f = int(round(info["end"] * FPS))
@@ -323,9 +229,6 @@ def main():
         for f in range(start_f, end_f):
             t = f / FPS - info["start"]
             frame, static = slide_frame(slide, t, cache)
-            draw_chips(frame, slide_num, t, info)
-            if keywords_for_slide(slide_num):
-                static = False
             if static and cached_static and cached_bytes is not None:
                 proc.stdin.write(cached_bytes)
                 continue

@@ -10,9 +10,6 @@ html, body { margin: 0; min-height: 100%; background: #202124; font-family: Aria
 .show.zoom-in { animation: zoom var(--dur) ease forwards; }
 .show.wipe-in { animation: wipe var(--dur) ease forwards; }
 .show.draw-in { animation: draw var(--dur) ease forwards; }
-#keywords { position: absolute; left: 8%; right: 8%; bottom: 11%; display: none; gap: 12px; flex-wrap: wrap; justify-content: center; align-items: center; pointer-events: none; }
-.kw { display: inline-flex; align-items: center; padding: 10px 18px; border-radius: 999px; background: rgba(255, 228, 121, .94); color: #1f1f1f; font-size: 22px; font-weight: 800; letter-spacing: .01em; opacity: 0; transform: translateY(10px) scale(.98); box-shadow: 0 10px 22px rgba(0,0,0,.18); border: 2px solid rgba(88, 79, 18, .28); }
-.kw.show { animation: kwIn .45s ease forwards; }
 #caption { position: absolute; left: 8%; right: 8%; bottom: 4%; min-height: 48px; padding: 10px 16px; display: none; align-items: center; justify-content: center; text-align: center; color: #fff; background: rgba(0,0,0,.58); font-size: 28px; line-height: 1.35; }
 #caption.on { display: flex; }
 #controls { position: fixed; left: 16px; bottom: 16px; display: flex; gap: 8px; }
@@ -24,4 +21,3 @@ button { border: 0; border-radius: 6px; padding: 10px 14px; background: #f6f7f8;
 @keyframes zoom { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: scale(1); } }
 @keyframes wipe { from { opacity: 0; clip-path: inset(0 100% 0 0); } to { opacity: 1; clip-path: inset(0); } }
 @keyframes draw { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: none; } }
-@keyframes kwIn { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: none; } }
