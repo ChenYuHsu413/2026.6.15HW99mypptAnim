@@ -186,6 +186,7 @@ python pipeline_server.py 8001
 ### Git 標籤
 - `editable-narration-block` — Phase II 可編輯旁白完成點
 - `preview-ui` — 最終簡化版 slide 預覽
+- `preview-ok-v2` — 只讀檢視器正式版（layer 編號 + highlight、adjustment notes、MP4 export）
 
 ### 目前使用方式
 ```bash
@@ -193,6 +194,22 @@ cd task=InfoGraphic2AIGCdirection
 python pipeline_server.py 8000
 # 打開 http://localhost:8000/task=InfoGraphic2AIGCdirection/pipeline-ui/
 ```
+
+---
+
+## 2026-06-16：preview-ok-v2 — 只讀檢視器正式版
+
+### 功能
+- 左欄：所有 slides 列表
+- 中央：preview（Composite / Original / Background / Debug / Gallery）
+  - ▶ Play slide：動畫播放 + 字幕 + 語音同步
+  - Open in HyperFrames：開完整 deck 預覽
+  - MP4 export：選取 slides 範圍 → 伺服器渲染成 MP4
+- 右欄：slide 數據、旁白文字 + 語音播放、Adjustment notes、layers 列表
+  - Layer 列表有編號（1, 2, 3...）
+  - 點擊 layer → preview 上對應 component 亮起 highlight
+- 頂部：Task 切換（所有 task=*）、Theme 切換（Dark/Light/Slate/Warm）
+- 所有修改透過 agent 對話進行，UI 僅做 review
 
 ### 已知限制
 - Adjustment notes 的 auto-processor 只支援簡單關鍵字（慢一點、快一點、換聲音等），複雜的切圖/動畫調整仍需透過 agent 對話執行
