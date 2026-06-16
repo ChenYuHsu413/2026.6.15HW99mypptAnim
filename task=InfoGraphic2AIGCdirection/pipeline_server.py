@@ -231,7 +231,6 @@ def apply_overrides(overrides):
             logs.append(f"TTS script not found at {tts_script}")
 
     log_info("Step 4/4: Rebuilding timeline ...")
-    # ── 4. Rebuild timeline ────────────────────────────────────────────
     build_script = SKILL_DIR / "build_timeline.py"
     if build_script.exists():
         r = run_python(build_script)
@@ -241,7 +240,92 @@ def apply_overrides(overrides):
     else:
         logs.append(f"Build script not found at {build_script}")
 
+    # ── 5. Auto-process adjustment notes ───────────────────────────────
+    rebuilt = False
+    for key, ov in overrides.items():
+        note = (ov.get("notes") or "").strip()
+        if not note:
+            continue
+        logs.append(f"---")
+        logs.append(f"Processing notes for {key}: \"{note[:80]}\"")
+        actions, did_tts = auto_process_note(note, key, logs)
+        for a in actions:
+            logs.append(f"  → {a}")
+        if not actions:
+            logs.append(f"  → (no rules matched — tell the agent in chat)")
+        if did_tts:
+            rebuilt = True
+
+    if rebuilt:
+        log_info("Rebuilding timeline after auto-processed notes ...")
+        build_script = SKILL_DIR / "build_timeline.py"
+        if build_script.exists():
+            r = run_python(build_script)
+            logs.append(f"Timeline (post-notes): {r.stdout.strip()}")
+            if r.returncode:
+                logs.append(f"Timeline error: {redact(r.stderr.strip())}")
+
     return logs
+
+
+def auto_process_note(note, slide_key, logs):
+    """Simple keyword-based processing for common requests.
+    Returns (actions, did_tts)."""
+    actions = []
+    did_tts = False
+    nl = note.lower()
+    tts = SKILL_DIR / "tts_edge.py"
+
+    if re.search(r"慢一点|慢一點|slower|slow\s*down", nl):
+        actions.append("Detected: slow down narration → re-running TTS at -10%")
+        if tts.exists():
+            r = run_python(tts, "zh-TW-YunJheNeural", "-10%")
+            actions.append(f"TTS: {r.stdout.strip() or '(ok)'}")
+            did_tts = True
+        return actions, did_tts
+
+    if re.search(r"快一点|快一點|faster|speed\s*up", nl):
+        actions.append("Detected: speed up narration → re-running TTS at +10%")
+        if tts.exists():
+            r = run_python(tts, "zh-TW-YunJheNeural", "+10%")
+            actions.append(f"TTS: {r.stdout.strip() or '(ok)'}")
+            did_tts = True
+        return actions, did_tts
+
+    if re.search(r"正常速|normal\s*speed", nl):
+        actions.append("Detected: normal speed → re-running TTS at -5%")
+        if tts.exists():
+            r = run_python(tts, "zh-TW-YunJheNeural", "-5%")
+            actions.append(f"TTS: {r.stdout.strip() or '(ok)'}")
+            did_tts = True
+        return actions, did_tts
+
+    if re.search(r"换(?:成|为)?.*[男女]声|change\s*voice|换声音", nl):
+        actions.append("Detected: voice change request → re-running TTS")
+        if tts.exists():
+            r = run_python(tts, "zh-TW-YunJheNeural", "+0%")
+            actions.append(f"TTS: {r.stdout.strip() or '(ok)'}")
+            did_tts = True
+        return actions, did_tts
+
+    if re.search(r"first|appear\s*first|先进[场場]|先出現|先進場", nl):
+        actions.append("Detected: animation order request")
+        m = re.search(r"slide\s*(\d+)", nl)
+        if m:
+            sn = int(m.group(1))
+            meta_path = TASK / "output" / f"slide_{sn:02d}" / "metadata.json"
+            meta = load_json(meta_path)
+            if meta:
+                if re.search(r"title|标题|標題", nl):
+                    for l in meta.get("layers", []):
+                        if l.get("type") == "title":
+                            l["z_index"] = 0
+                            l["start"] = 0.45
+                            actions.append(f"→ force {l['name']} first (z=0)")
+                    write_json(meta_path, meta)
+        return actions, did_tts
+
+    return actions, did_tts
 
 
 class Handler(BaseHTTPRequestHandler):
