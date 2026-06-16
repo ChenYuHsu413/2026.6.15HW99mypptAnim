@@ -77,7 +77,7 @@ button, input { font: inherit; }
   justify-content: space-between;
   padding: 16px 22px;
   border-bottom: 1px solid var(--line);
-  background: rgba(13, 17, 23, .86);
+  background: var(--panel);
   backdrop-filter: blur(16px);
 }
 
@@ -163,11 +163,10 @@ button, input { font: inherit; }
   min-height: 0;
 }
 
-.sidebar, .card, .preview-card, .timeline-panel {
+.sidebar, .card, .preview-card, .timeline-panel, .suggestions-panel {
   border: 1px solid var(--line);
   border-radius: 18px;
-  background: rgba(21, 27, 35, .88);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, .24);
+  background: var(--panel);
 }
 
 .sidebar {
@@ -205,7 +204,7 @@ button, input { font: inherit; }
 
 .slide-button:hover, .slide-button.active {
   border-color: var(--accent);
-  background: #1e2b3d;
+  background: var(--panel-2);
 }
 
 .slide-button strong { display: block; margin-bottom: 4px; }
@@ -245,7 +244,7 @@ button, input { font: inherit; }
   border-radius: 999px;
   padding: 8px 12px;
   color: var(--muted);
-  background: rgba(21, 27, 35, .8);
+  background: var(--panel-2);
   cursor: pointer;
 }
 
@@ -321,7 +320,7 @@ button, input { font: inherit; }
   position: relative;
   height: 18px;
   border-radius: 999px;
-  background: #0e1622;
+  background: var(--bg);
   overflow: hidden;
 }
 
@@ -345,11 +344,7 @@ button, input { font: inherit; }
 }
 
 .suggestions-panel {
-  border: 1px solid var(--line);
-  border-radius: 18px;
   padding: 14px;
-  background: rgba(21, 27, 35, .88);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, .24);
   min-height: 0;
 }
 .suggestions-header {
@@ -469,7 +464,7 @@ audio { width: 100%; }
   border: 1px solid var(--line);
   border-radius: 14px;
   padding: 10px;
-  background: #101722;
+  background: var(--panel-2);
   cursor: pointer;
 }
 
@@ -557,13 +552,13 @@ audio { width: 100%; }
   border: 1px solid var(--danger);
   border-radius: 18px;
   padding: 18px;
-  background: rgba(251, 113, 133, .12);
+  background: var(--panel-2);
 }
 
 code {
   border-radius: 6px;
   padding: 2px 5px;
-  background: rgba(255, 255, 255, .08);
+  background: var(--panel-2);
 }
 
 @media (max-width: 1100px) {
