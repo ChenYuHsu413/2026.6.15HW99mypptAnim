@@ -4,6 +4,8 @@ const playBtn = document.getElementById('playBtn');
 const slideSelect = document.getElementById('slideSelect');
 const progress = document.getElementById('progress').querySelector('.fill');
 
+if (!slideEl) document.body.innerHTML = '<div style="color:#fff;padding:40px">Error: #slide not found</div>';
+
 const pad = n => String(n).padStart(2, '0');
 const root = '..';
 let project = null;
@@ -13,16 +15,21 @@ let timers = [];
 let playing = false;
 
 async function init() {
-  project = await (await fetch(`${root}/hyperframes/project.json`)).json();
-  timing = await (await fetch(`${root}/narration/narration_timing.json`)).json();
-  project.slides.forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s.slide;
-    opt.textContent = `Slide ${pad(s.slide)}`;
-    slideSelect.appendChild(opt);
-  });
-  slideSelect.addEventListener('change', () => showSlide(Number(slideSelect.value)));
-  showSlide(project.slides[0].slide);
+  try {
+    project = await (await fetch(`${root}/hyperframes/project.json`)).json();
+    timing = await (await fetch(`${root}/narration/narration_timing.json`)).json();
+    project.slides.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.slide;
+      opt.textContent = `Slide ${pad(s.slide)}`;
+      slideSelect.appendChild(opt);
+    });
+    slideSelect.addEventListener('change', () => showSlide(Number(slideSelect.value)));
+    showSlide(project.slides[0].slide);
+  } catch(e) {
+    document.body.innerHTML = `<div style="color:#fb7185;padding:40px;font-size:16px">⚠️ ${e.message}<br><br>Make sure the server is running from the project root.</div>`;
+    console.error(e);
+  }
 }
 
 function showSlide(num) {
