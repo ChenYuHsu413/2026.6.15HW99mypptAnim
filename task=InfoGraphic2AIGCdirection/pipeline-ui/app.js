@@ -15,6 +15,7 @@ const state = {
 
 const projectRoot = new URL('../../', window.location.href).href;
 const taskSelect = document.getElementById('taskSelect');
+const themeSelect = document.getElementById('themeSelect');
 const saveBtn = document.getElementById('saveBtn');
 const applyBtn = document.getElementById('applyBtn');
 const pipelineLog = document.getElementById('pipelineLog');
@@ -417,6 +418,16 @@ taskSelect.addEventListener('change', async e => {
 showSkippedLayers.addEventListener('change', e => {
   state.showSkippedLayers = e.target.checked;
   if (state.selectedSlide) renderSelectedSlide();
+});
+
+// ── Theme ──────────────────────────────────────────────────────────
+const savedTheme = localStorage.getItem('pipeline-ui-theme') || 'dark';
+document.documentElement.className = `theme-${savedTheme}`;
+themeSelect.value = savedTheme;
+themeSelect.addEventListener('change', () => {
+  const theme = themeSelect.value;
+  document.documentElement.className = `theme-${theme}`;
+  localStorage.setItem('pipeline-ui-theme', theme);
 });
 
 init();
