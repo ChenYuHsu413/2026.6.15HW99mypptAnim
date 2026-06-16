@@ -203,6 +203,13 @@ def apply_overrides(overrides):
 
 
 class Handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self._cors()
+        self.send_header("Content-Type", "text/plain")
+        self.end_headers()
+        self.wfile.write(b"Pipeline server running. Use POST /apply or POST /suggest from the Pipeline UI.")
+
     def do_POST(self):
         if self.path == "/apply":
             length = int(self.headers.get("Content-Length", 0))
