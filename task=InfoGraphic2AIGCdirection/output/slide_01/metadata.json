@@ -5,30 +5,17 @@
   "duration": 16.8,
   "layers": [
     {
-      "name": "slide_01_title_01.png",
+      "name": "slide_01_title_main.png",
       "type": "title",
-      "x": 850,
-      "y": 62,
-      "width": 795,
-      "height": 138,
+      "x": 910,
+      "y": 79,
+      "width": 739,
+      "height": 140,
       "z_index": 5,
       "animation": "fade-in-down",
       "start": 0.45,
       "duration": 0.7,
       "narration_cue": "title"
-    },
-    {
-      "name": "slide_01_text_block_01.png",
-      "type": "text_block",
-      "x": 850,
-      "y": 215,
-      "width": 785,
-      "height": 106,
-      "z_index": 6,
-      "animation": "fade-in-up",
-      "start": 2.0,
-      "duration": 0.7,
-      "narration_cue": "narrow-ai-text"
     },
     {
       "name": "slide_01_illustration_01.png",
@@ -44,6 +31,19 @@
       "narration_cue": "illustration"
     },
     {
+      "name": "slide_01_title_sub.png",
+      "type": "text_block",
+      "x": 910,
+      "y": 219,
+      "width": 739,
+      "height": 105,
+      "z_index": 6,
+      "animation": "fade-in-up",
+      "start": 2.0,
+      "duration": 0.7,
+      "narration_cue": "narrow-ai-text"
+    },
+    {
       "name": "slide_01_illustration_02.png",
       "type": "illustration",
       "x": 298,
@@ -52,7 +52,7 @@
       "height": 438,
       "z_index": 8,
       "animation": "zoom-in",
-      "start": 6.71,
+      "start": 6.0,
       "duration": 0.7,
       "narration_cue": "illustration"
     },
@@ -65,7 +65,7 @@
       "height": 475,
       "z_index": 9,
       "animation": "zoom-in",
-      "start": 8.79,
+      "start": 8.0,
       "duration": 0.7,
       "narration_cue": "illustration"
     },
@@ -78,7 +78,7 @@
       "height": 444,
       "z_index": 10,
       "animation": "zoom-in",
-      "start": 10.88,
+      "start": 10.0,
       "duration": 0.7,
       "narration_cue": "illustration"
     },
@@ -91,7 +91,7 @@
       "height": 314,
       "z_index": 11,
       "animation": "zoom-in",
-      "start": 12.96,
+      "start": 12.0,
       "duration": 0.7,
       "narration_cue": "illustration"
     }

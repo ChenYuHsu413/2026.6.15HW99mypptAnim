@@ -96,14 +96,7 @@ MAX_LAYERS = 16
 # Prefer fixing the algorithm over adding an override -- this skill is meant
 # to be reusable. Only override when the same pattern would mis-fire on
 # another deck if generalized.
-OVERRIDES = {
-    1: {
-        "merge": [
-            {"box": [850, 60, 800, 140], "tight": True, "type": "title", "absorb": 0.35},
-            {"box": [850, 215, 800, 115], "tight": True, "type": "text_block", "absorb": 0.35},
-        ]
-    }
-}
+OVERRIDES = {}
 
 
 def load_slide(slide_num):
