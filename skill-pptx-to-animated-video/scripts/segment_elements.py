@@ -99,8 +99,8 @@ MAX_LAYERS = 16
 OVERRIDES = {
     1: {
         "merge": [
-            {"box": [850, 40, 800, 140], "tight": True, "type": "title", "absorb": 0.35},
-            {"box": [850, 180, 800, 120], "tight": True, "type": "text_block", "absorb": 0.35},
+            {"box": [850, 60, 800, 140], "tight": True, "type": "title", "absorb": 0.35},
+            {"box": [850, 215, 800, 115], "tight": True, "type": "text_block", "absorb": 0.35},
         ]
     }
 }
