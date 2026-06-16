@@ -19,16 +19,16 @@
     },
     {
       "name": "slide_01_illustration_01.png",
-      "type": "illustration",
+      "type": "text_block",
       "x": 315,
       "y": 104,
       "width": 601,
       "height": 221,
       "z_index": 6,
-      "animation": "zoom-in",
-      "start": 1.8,
+      "animation": "fade-in-up",
+      "start": 2.5,
       "duration": 0.7,
-      "narration_cue": "illustration"
+      "narration_cue": "narrow-ai-text"
     },
     {
       "name": "slide_01_illustration_02.png",
@@ -39,7 +39,7 @@
       "height": 438,
       "z_index": 7,
       "animation": "zoom-in",
-      "start": 4.0,
+      "start": 4.5,
       "duration": 0.7,
       "narration_cue": "illustration"
     },
@@ -52,7 +52,7 @@
       "height": 475,
       "z_index": 8,
       "animation": "zoom-in",
-      "start": 6.5,
+      "start": 7.0,
       "duration": 0.7,
       "narration_cue": "illustration"
     },
@@ -65,7 +65,7 @@
       "height": 444,
       "z_index": 9,
       "animation": "zoom-in",
-      "start": 9.0,
+      "start": 9.5,
       "duration": 0.7,
       "narration_cue": "illustration"
     },
@@ -78,7 +78,7 @@
       "height": 314,
       "z_index": 10,
       "animation": "zoom-in",
-      "start": 11.5,
+      "start": 12.0,
       "duration": 0.7,
       "narration_cue": "illustration"
     }
