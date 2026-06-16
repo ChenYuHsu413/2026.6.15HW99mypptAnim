@@ -3,124 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>InfoGraphic Pipeline UI</title>
+  <title>Slide Preview</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="topbar">
-    <div>
-      <p class="eyebrow">Read-only pipeline inspector</p>
-      <h1>InfoGraphic2AIGCdirection</h1>
-    </div>
-    <div class="topbar-actions">
-      <label class="task-select">
-        <span>Task</span>
-        <select id="taskSelect"></select>
-      </label>
-      <label class="theme-select">
-        <span>Theme</span>
-        <select id="themeSelect">
-          <option value="dark">Dark</option>
-          <option value="light">Light</option>
-          <option value="slate">Slate</option>
-          <option value="warm">Warm</option>
-        </select>
-      </label>
-      <button id="saveBtn" class="save-btn" disabled>Save overrides</button>
-      <button id="applyBtn" class="apply-btn" disabled>Apply to pipeline</button>
-      <div class="status" id="status">Loading project...</div>
-    </div>
-  </header>
-
-  <main class="app-shell">
-    <aside class="sidebar">
-      <div class="panel-title">Slides</div>
-      <div id="slideList" class="slide-list"></div>
-    </aside>
-
-    <section class="viewer">
-      <div class="viewer-header">
-        <div>
-          <p class="eyebrow" id="selectedSlideLabel">Slide</p>
-          <h2 id="selectedSlideTitle">Select a slide</h2>
-        </div>
-        <div class="viewer-actions">
-          <button id="playBtn" class="play-btn">▶ Play slide</button>
-          <button id="hyperframesBtn" class="hf-btn">Open in HyperFrames</button>
-          <label class="switch">
-            <input type="checkbox" id="showSkippedLayers">
-            <span>Show skipped card layers</span>
-          </label>
-        </div>
-      </div>
-
-      <div class="asset-tabs" role="tablist" aria-label="Preview assets">
-        <button class="asset-tab active" data-view="composite">Composite</button>
-        <button class="asset-tab" data-view="original">Original</button>
-        <button class="asset-tab" data-view="background">Background</button>
-        <button class="asset-tab" data-view="debug">Debug</button>
-        <button class="asset-tab" data-view="gallery">Layer gallery</button>
-      </div>
-
-      <div class="preview-card">
-        <div id="compositePreview" class="stage-preview"></div>
-        <img id="assetPreview" class="asset-preview" alt="Selected pipeline asset">
-      </div>
-
-      <section class="notes-section">
-        <div class="notes-header">
-          <span class="panel-title">Adjustment notes (agent will apply)</span>
-        </div>
-        <textarea id="adjustmentNotes" class="notes-input" placeholder="e.g. Slide 5: merge text blocks, change animation order, slow down…"></textarea>
-      </section>
-
-      <section class="suggestions-panel" id="suggestionsPanel" hidden>
-        <div class="suggestions-header">
-          <span class="panel-title">Suggestions</span>
-          <button id="suggestBtn" class="suggest-btn">Analyze slide</button>
-        </div>
-        <div id="suggestionsList" class="suggestions-list"></div>
-      </section>
-
-      <section class="timeline-panel">
-        <div class="panel-title">Layer timing</div>
-        <div id="timeline" class="timeline"></div>
-      </section>
-    </section>
-
-    <aside class="inspector">
-      <section class="card">
-        <div class="panel-title">Slide data</div>
-        <dl id="slideStats" class="stats"></dl>
-      </section>
-
-      <section class="card">
-        <div class="panel-title">Narration</div>
-        <p id="narrationText" class="narration"></p>
-        <audio id="audioPlayer" controls></audio>
-      </section>
-
-      <section class="card layers-card">
-        <div class="panel-title">Layers</div>
-        <div id="layerList" class="layer-list"></div>
-      </section>
-      <section class="card log-card">
-        <div class="panel-title">Pipeline log</div>
-        <pre id="pipelineLog" class="log-output">Ready.</pre>
-      </section>
-    </aside>
-  </main>
-
-  <template id="loadErrorTemplate">
-    <div class="load-error">
-      <strong>Could not load project files.</strong>
-      <p>From the task directory, run:</p>
-      <p><code>cd task=InfoGraphic2AIGCdirection</code></p>
-      <p><code>python pipeline_server.py 8000</code></p>
-      <p>Then open <code>http://localhost:8000/task=InfoGraphic2AIGCdirection/pipeline-ui/</code></p>
-    </div>
-  </template>
-
-  <script src="app.js?v=4"></script>
+  <div id="stage">
+    <div id="slide"></div>
+    <div id="caption"></div>
+    <div id="progress"></div>
+  </div>
+  <div id="controls">
+    <select id="slideSelect"></select>
+    <button id="playBtn">Play</button>
+  </div>
+  <script src="app.js?v=5"></script>
 </body>
 </html>
