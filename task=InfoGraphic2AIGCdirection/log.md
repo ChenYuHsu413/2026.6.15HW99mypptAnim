@@ -215,3 +215,12 @@ python pipeline_server.py 8000
 - Adjustment notes 的 auto-processor 只支援簡單關鍵字（慢一點、快一點、換聲音等），複雜的切圖/動畫調整仍需透過 agent 對話執行
 - Slide 01 的 title 拆分使用手動 PNG 裁切方式，未整合進 segment_elements.py 的 OVERRIDES 機制
 - 部分 slides 的切圖仍可能不完全（text block 合併、collage cluster 等）
+
+### Git 標籤總覽
+| Tag | 說明 |
+|---|---|
+| `editable-narration-block` | Phase II 可編輯旁白完成點 |
+| `preview-ui` | 簡化版 slide 預覽 |
+| `preview-ok-v2` | 只讀檢視器：layer 編號 + highlight、adjustment notes、MP4 export |
+| `preview-ok-v3` | v2 + notes 移到 slide 下方 |
+| `preview-ok-v3-fix-notes` | v3 + notes 自動儲存到 localStorage + pipeline_state.json |
