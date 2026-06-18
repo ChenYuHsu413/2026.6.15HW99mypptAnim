@@ -40,6 +40,7 @@
         {
           "id": "s01-title-01",
           "image": "output/slide_01/slide_01_title_01.png",
+          "type": "title",
           "bbox": [
             479,
             146,
@@ -57,6 +58,7 @@
         {
           "id": "s01-key-point-card-01",
           "image": "output/slide_01/slide_01_key_point_card_01.png",
+          "type": "key_point_card",
           "bbox": [
             1484,
             27,
@@ -74,6 +76,7 @@
         {
           "id": "s01-illustration-01",
           "image": "output/slide_01/slide_01_illustration_01.png",
+          "type": "illustration",
           "bbox": [
             175,
             459,
@@ -91,6 +94,7 @@
         {
           "id": "s01-illustration-02",
           "image": "output/slide_01/slide_01_illustration_02.png",
+          "type": "illustration",
           "bbox": [
             597,
             559,
@@ -119,6 +123,7 @@
         {
           "id": "s02-key-point-card-01",
           "image": "output/slide_02/slide_02_key_point_card_01.png",
+          "type": "key_point_card",
           "bbox": [
             102,
             106,
@@ -136,6 +141,7 @@
         {
           "id": "s02-key-point-card-02",
           "image": "output/slide_02/slide_02_key_point_card_02.png",
+          "type": "key_point_card",
           "bbox": [
             996,
             357,
@@ -153,6 +159,7 @@
         {
           "id": "s02-key-point-card-03",
           "image": "output/slide_02/slide_02_key_point_card_03.png",
+          "type": "key_point_card",
           "bbox": [
             102,
             600,
@@ -181,6 +188,7 @@
         {
           "id": "s03-key-point-card-01",
           "image": "output/slide_03/slide_03_key_point_card_01.png",
+          "type": "key_point_card",
           "bbox": [
             40,
             452,
@@ -198,6 +206,7 @@
         {
           "id": "s03-arrow-01",
           "image": "output/slide_03/slide_03_arrow_01.png",
+          "type": "arrow",
           "bbox": [
             287,
             522,
@@ -215,6 +224,7 @@
         {
           "id": "s03-key-point-card-02",
           "image": "output/slide_03/slide_03_key_point_card_02.png",
+          "type": "key_point_card",
           "bbox": [
             341,
             452,
@@ -232,6 +242,7 @@
         {
           "id": "s03-arrow-02",
           "image": "output/slide_03/slide_03_arrow_02.png",
+          "type": "arrow",
           "bbox": [
             630,
             522,
@@ -249,6 +260,7 @@
         {
           "id": "s03-key-point-card-03",
           "image": "output/slide_03/slide_03_key_point_card_03.png",
+          "type": "key_point_card",
           "bbox": [
             685,
             452,
@@ -266,6 +278,7 @@
         {
           "id": "s03-arrow-03",
           "image": "output/slide_03/slide_03_arrow_03.png",
+          "type": "arrow",
           "bbox": [
             931,
             522,
@@ -283,6 +296,7 @@
         {
           "id": "s03-key-point-card-04",
           "image": "output/slide_03/slide_03_key_point_card_04.png",
+          "type": "key_point_card",
           "bbox": [
             985,
             452,
@@ -300,6 +314,7 @@
         {
           "id": "s03-highlight-group-01",
           "image": "output/slide_03/slide_03_highlight_group_01.png",
+          "type": "highlight_group",
           "bbox": [
             1228,
             263,
@@ -317,6 +332,7 @@
         {
           "id": "s03-key-point-card-05",
           "image": "output/slide_03/slide_03_key_point_card_05.png",
+          "type": "key_point_card",
           "bbox": [
             1638,
             452,
@@ -345,6 +361,7 @@
         {
           "id": "s04-key-point-card-01",
           "image": "output/slide_04/slide_04_key_point_card_01.png",
+          "type": "key_point_card",
           "bbox": [
             706,
             87,
@@ -362,6 +379,7 @@
         {
           "id": "s04-key-point-card-02",
           "image": "output/slide_04/slide_04_key_point_card_02.png",
+          "type": "key_point_card",
           "bbox": [
             380,
             573,
@@ -379,6 +397,7 @@
         {
           "id": "s04-key-point-card-03",
           "image": "output/slide_04/slide_04_key_point_card_03.png",
+          "type": "key_point_card",
           "bbox": [
             1053,
             564,
@@ -407,6 +426,7 @@
         {
           "id": "s05-table-01",
           "image": "output/slide_05/slide_05_table_01.png",
+          "type": "table",
           "bbox": [
             121,
             137,
@@ -424,6 +444,7 @@
         {
           "id": "s05-illustration-01",
           "image": "output/slide_05/slide_05_illustration_01.png",
+          "type": "illustration",
           "bbox": [
             1418,
             307,
@@ -452,6 +473,7 @@
         {
           "id": "s06-illustration-01",
           "image": "output/slide_06/slide_06_illustration_01.png",
+          "type": "illustration",
           "bbox": [
             182,
             102,
@@ -469,6 +491,7 @@
         {
           "id": "s06-illustration-02",
           "image": "output/slide_06/slide_06_illustration_02.png",
+          "type": "illustration",
           "bbox": [
             1058,
             125,
@@ -486,6 +509,7 @@
         {
           "id": "s06-illustration-03",
           "image": "output/slide_06/slide_06_illustration_03.png",
+          "type": "illustration",
           "bbox": [
             480,
             657,
@@ -514,6 +538,7 @@
         {
           "id": "s07-illustration-01",
           "image": "output/slide_07/slide_07_illustration_01.png",
+          "type": "illustration",
           "bbox": [
             105,
             96,
@@ -531,6 +556,7 @@
         {
           "id": "s07-illustration-02",
           "image": "output/slide_07/slide_07_illustration_02.png",
+          "type": "illustration",
           "bbox": [
             699,
             96,
@@ -548,6 +574,7 @@
         {
           "id": "s07-illustration-03",
           "image": "output/slide_07/slide_07_illustration_03.png",
+          "type": "illustration",
           "bbox": [
             1303,
             96,
@@ -565,6 +592,7 @@
         {
           "id": "s07-illustration-04",
           "image": "output/slide_07/slide_07_illustration_04.png",
+          "type": "illustration",
           "bbox": [
             232,
             747,
@@ -593,6 +621,7 @@
         {
           "id": "s08-illustration-01",
           "image": "output/slide_08/slide_08_illustration_01.png",
+          "type": "illustration",
           "bbox": [
             104,
             123,
@@ -610,6 +639,7 @@
         {
           "id": "s08-key-point-card-01",
           "image": "output/slide_08/slide_08_key_point_card_01.png",
+          "type": "key_point_card",
           "bbox": [
             989,
             290,
@@ -638,6 +668,7 @@
         {
           "id": "s09-key-point-card-01",
           "image": "output/slide_09/slide_09_key_point_card_01.png",
+          "type": "key_point_card",
           "bbox": [
             101,
             220,
@@ -655,6 +686,7 @@
         {
           "id": "s09-illustration-01",
           "image": "output/slide_09/slide_09_illustration_01.png",
+          "type": "illustration",
           "bbox": [
             695,
             397,
@@ -672,6 +704,7 @@
         {
           "id": "s09-key-point-card-02",
           "image": "output/slide_09/slide_09_key_point_card_02.png",
+          "type": "key_point_card",
           "bbox": [
             1276,
             220,
@@ -700,6 +733,7 @@
         {
           "id": "s10-title-01",
           "image": "output/slide_10/slide_10_title_01.png",
+          "type": "title",
           "bbox": [
             147,
             42,
@@ -717,6 +751,7 @@
         {
           "id": "s10-chart-01",
           "image": "output/slide_10/slide_10_chart_01.png",
+          "type": "chart",
           "bbox": [
             334,
             284,
@@ -734,6 +769,7 @@
         {
           "id": "s10-annotation-01",
           "image": "output/slide_10/slide_10_annotation_01.png",
+          "type": "annotation",
           "bbox": [
             388,
             749,
@@ -762,6 +798,7 @@
         {
           "id": "s11-title-01",
           "image": "output/slide_11/slide_11_title_01.png",
+          "type": "title",
           "bbox": [
             261,
             65,
@@ -779,6 +816,7 @@
         {
           "id": "s11-chart-01",
           "image": "output/slide_11/slide_11_chart_01.png",
+          "type": "chart",
           "bbox": [
             124,
             336,
@@ -796,6 +834,7 @@
         {
           "id": "s11-annotation-01",
           "image": "output/slide_11/slide_11_annotation_01.png",
+          "type": "annotation",
           "bbox": [
             1108,
             429,
@@ -813,6 +852,7 @@
         {
           "id": "s11-annotation-02",
           "image": "output/slide_11/slide_11_annotation_02.png",
+          "type": "annotation",
           "bbox": [
             330,
             338,
@@ -841,6 +881,7 @@
         {
           "id": "s12-key-point-card-01",
           "image": "output/slide_12/slide_12_key_point_card_01.png",
+          "type": "key_point_card",
           "bbox": [
             1022,
             144,
@@ -858,6 +899,7 @@
         {
           "id": "s12-key-point-card-02",
           "image": "output/slide_12/slide_12_key_point_card_02.png",
+          "type": "key_point_card",
           "bbox": [
             123,
             157,
@@ -875,6 +917,7 @@
         {
           "id": "s12-illustration-01",
           "image": "output/slide_12/slide_12_illustration_01.png",
+          "type": "illustration",
           "bbox": [
             1001,
             576,
@@ -903,6 +946,7 @@
         {
           "id": "s13-illustration-01",
           "image": "output/slide_13/slide_13_illustration_01.png",
+          "type": "illustration",
           "bbox": [
             900,
             51,
@@ -920,6 +964,7 @@
         {
           "id": "s13-chart-01",
           "image": "output/slide_13/slide_13_chart_01.png",
+          "type": "chart",
           "bbox": [
             140,
             76,
@@ -937,6 +982,7 @@
         {
           "id": "s13-annotation-01",
           "image": "output/slide_13/slide_13_annotation_01.png",
+          "type": "annotation",
           "bbox": [
             298,
             292,
@@ -954,6 +1000,7 @@
         {
           "id": "s13-illustration-02",
           "image": "output/slide_13/slide_13_illustration_02.png",
+          "type": "illustration",
           "bbox": [
             900,
             550,
@@ -982,6 +1029,7 @@
         {
           "id": "s14-illustration-01",
           "image": "output/slide_14/slide_14_illustration_01.png",
+          "type": "illustration",
           "bbox": [
             965,
             93,
@@ -999,6 +1047,7 @@
         {
           "id": "s14-illustration-02",
           "image": "output/slide_14/slide_14_illustration_02.png",
+          "type": "illustration",
           "bbox": [
             296,
             196,
@@ -1016,6 +1065,7 @@
         {
           "id": "s14-illustration-03",
           "image": "output/slide_14/slide_14_illustration_03.png",
+          "type": "illustration",
           "bbox": [
             968,
             557,
@@ -1044,6 +1094,7 @@
         {
           "id": "s15-key-point-card-01",
           "image": "output/slide_15/slide_15_key_point_card_01.png",
+          "type": "key_point_card",
           "bbox": [
             66,
             289,
@@ -1061,6 +1112,7 @@
         {
           "id": "s15-key-point-card-02",
           "image": "output/slide_15/slide_15_key_point_card_02.png",
+          "type": "key_point_card",
           "bbox": [
             724,
             288,
@@ -1078,6 +1130,7 @@
         {
           "id": "s15-key-point-card-03",
           "image": "output/slide_15/slide_15_key_point_card_03.png",
+          "type": "key_point_card",
           "bbox": [
             1272,
             341,
@@ -1106,6 +1159,7 @@
         {
           "id": "s16-key-point-card-01",
           "image": "output/slide_16/slide_16_key_point_card_01.png",
+          "type": "key_point_card",
           "bbox": [
             89,
             300,
@@ -1123,6 +1177,7 @@
         {
           "id": "s16-key-point-card-02",
           "image": "output/slide_16/slide_16_key_point_card_02.png",
+          "type": "key_point_card",
           "bbox": [
             691,
             300,
@@ -1140,6 +1195,7 @@
         {
           "id": "s16-key-point-card-03",
           "image": "output/slide_16/slide_16_key_point_card_03.png",
+          "type": "key_point_card",
           "bbox": [
             1351,
             299,
@@ -1168,6 +1224,7 @@
         {
           "id": "s17-key-point-card-01",
           "image": "output/slide_17/slide_17_key_point_card_01.png",
+          "type": "key_point_card",
           "bbox": [
             173,
             90,
@@ -1185,6 +1242,7 @@
         {
           "id": "s17-illustration-01",
           "image": "output/slide_17/slide_17_illustration_01.png",
+          "type": "illustration",
           "bbox": [
             181,
             396,
@@ -1202,6 +1260,7 @@
         {
           "id": "s17-key-point-card-02",
           "image": "output/slide_17/slide_17_key_point_card_02.png",
+          "type": "key_point_card",
           "bbox": [
             1293,
             90,
@@ -1219,6 +1278,7 @@
         {
           "id": "s17-illustration-02",
           "image": "output/slide_17/slide_17_illustration_02.png",
+          "type": "illustration",
           "bbox": [
             51,
             735,
@@ -1247,6 +1307,7 @@
         {
           "id": "s18-title-01",
           "image": "output/slide_18/slide_18_title_01.png",
+          "type": "title",
           "bbox": [
             62,
             50,
@@ -1264,6 +1325,7 @@
         {
           "id": "s18-illustration-01",
           "image": "output/slide_18/slide_18_illustration_01.png",
+          "type": "illustration",
           "bbox": [
             514,
             258,
@@ -1292,6 +1354,7 @@
         {
           "id": "s19-key-point-card-01",
           "image": "output/slide_19/slide_19_key_point_card_01.png",
+          "type": "key_point_card",
           "bbox": [
             479,
             63,
@@ -1309,6 +1372,7 @@
         {
           "id": "s19-key-point-card-02",
           "image": "output/slide_19/slide_19_key_point_card_02.png",
+          "type": "key_point_card",
           "bbox": [
             141,
             488,
@@ -1326,6 +1390,7 @@
         {
           "id": "s19-key-point-card-03",
           "image": "output/slide_19/slide_19_key_point_card_03.png",
+          "type": "key_point_card",
           "bbox": [
             1042,
             491,
@@ -1354,6 +1419,7 @@
         {
           "id": "s20-illustration-01",
           "image": "output/slide_20/slide_20_illustration_01.png",
+          "type": "illustration",
           "bbox": [
             316,
             373,
@@ -1371,6 +1437,7 @@
         {
           "id": "s20-illustration-02",
           "image": "output/slide_20/slide_20_illustration_02.png",
+          "type": "illustration",
           "bbox": [
             494,
             629,

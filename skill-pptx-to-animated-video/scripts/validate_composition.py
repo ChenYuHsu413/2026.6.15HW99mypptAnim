@@ -12,6 +12,8 @@ import json
 import sys
 from pathlib import Path
 
+import overrides
+
 ROOT = Path.cwd()
 OUT = ROOT / "output"
 NARRATION = ROOT / "narration"
@@ -20,6 +22,7 @@ NARRATION = ROOT / "narration"
 def main():
     comp = json.loads((ROOT / "composition.json").read_text(encoding="utf-8"))
     timing = json.loads((NARRATION / "narration_timing.json").read_text(encoding="utf-8"))
+    ov = overrides.load()
     metas = {}
     for p in OUT.glob("slide_*/metadata.json"):
         m = json.loads(p.read_text(encoding="utf-8"))
@@ -46,17 +49,27 @@ def main():
             errors.append(f"{key}: layer count {len(s['layers'])} != {len(meta['layers'])}")
             continue
         for cl, ml in zip(s["layers"], meta["layers"]):
+            o = overrides.layer(ov, n, ml["name"])  # expected = generated (+) override
+            exp_id = overrides.stable_id(n, ml["name"])
+            exp_z = o.get("z", ml["z_index"])
+            exp_anim = o.get("animation", ml["animation"])
+            exp_start = o.get("start", ml["start"])
+            exp_dur = o.get("duration", ml["duration"])
+            if cl["id"] != exp_id:
+                errors.append(f"{key}: id {cl['id']} != {exp_id}")
             if cl["id"] in seen_ids:
                 errors.append(f"{key}: duplicate id {cl['id']}")
             seen_ids.add(cl["id"])
+            if cl["type"] != ml["type"]:
+                errors.append(f"{key}/{cl['id']}: type {cl['type']} != {ml['type']}")
             if cl["bbox"] != [ml["x"], ml["y"], ml["width"], ml["height"]]:
                 errors.append(f"{key}/{cl['id']}: bbox {cl['bbox']} != {[ml['x'], ml['y'], ml['width'], ml['height']]}")
-            if cl["z"] != ml["z_index"]:
-                errors.append(f"{key}/{cl['id']}: z {cl['z']} != {ml['z_index']}")
-            if cl["enter"]["type"] != ml["animation"]:
-                errors.append(f"{key}/{cl['id']}: enter {cl['enter']['type']} != {ml['animation']}")
-            if cl["start"] != ml["start"] or cl["duration"] != ml["duration"]:
-                errors.append(f"{key}/{cl['id']}: timing ({cl['start']},{cl['duration']}) != ({ml['start']},{ml['duration']})")
+            if cl["z"] != exp_z:
+                errors.append(f"{key}/{cl['id']}: z {cl['z']} != {exp_z}")
+            if cl["enter"]["type"] != exp_anim:
+                errors.append(f"{key}/{cl['id']}: enter {cl['enter']['type']} != {exp_anim}")
+            if cl["start"] != exp_start or cl["duration"] != exp_dur:
+                errors.append(f"{key}/{cl['id']}: timing ({cl['start']},{cl['duration']}) != ({exp_start},{exp_dur})")
 
     if errors:
         print(f"FAIL ({len(errors)} issue(s)):")

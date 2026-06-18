@@ -17,16 +17,11 @@ import json
 from pathlib import Path
 
 import config
+import overrides
 
 ROOT = Path.cwd()
 OUT = ROOT / "output"
 NARRATION = ROOT / "narration"
-
-
-def stable_id(slide, name):
-    """slide_02_table_01.png -> s02-table-01 (stable while the filename is)."""
-    parts = name.rsplit(".", 1)[0].split("_")  # [slide, 02, table, 01]
-    return f"s{int(slide):02d}-" + "-".join(parts[2:])
 
 
 def caption_style():
@@ -49,24 +44,29 @@ def caption_style():
 
 def main():
     timing = json.loads((NARRATION / "narration_timing.json").read_text(encoding="utf-8"))
+    ov = overrides.load()
     slides = []
     for p in sorted(OUT.glob("slide_*/metadata.json")):
         meta = json.loads(p.read_text(encoding="utf-8"))
         n = meta["slide"]
         key = f"slide_{n:02d}"
         t = timing.get(key, {})
-        layers = [
-            {
-                "id": stable_id(n, l["name"]),
-                "image": f"output/{key}/{l['name']}",
-                "bbox": [l["x"], l["y"], l["width"], l["height"]],
-                "z": l["z_index"],
-                "enter": {"type": l["animation"], "intensity": 1.0},
-                "start": l["start"],
-                "duration": l["duration"],
-            }
-            for l in meta["layers"]
-        ]
+        layers = []
+        for l in meta["layers"]:
+            o = overrides.layer(ov, n, l["name"])  # {} if unedited
+            layers.append(
+                {
+                    "id": overrides.stable_id(n, l["name"]),
+                    "image": f"output/{key}/{l['name']}",
+                    "type": l["type"],
+                    "bbox": [l["x"], l["y"], l["width"], l["height"]],
+                    "z": o.get("z", l["z_index"]),
+                    "enter": {"type": o.get("animation", l["animation"]), "intensity": o.get("intensity", 1.0)},
+                    "start": o.get("start", l["start"]),
+                    "duration": o.get("duration", l["duration"]),
+                }
+            )
+        narration = overrides.narration(ov, n)
         slides.append(
             {
                 "index": n,
@@ -75,7 +75,7 @@ def main():
                 "start": t.get("start"),
                 "end": t.get("end"),
                 "duration": meta["duration"],
-                "narration": t.get("script", ""),
+                "narration": narration if narration is not None else t.get("script", ""),
                 "layers": layers,
             }
         )

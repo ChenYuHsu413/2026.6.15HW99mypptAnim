@@ -13,7 +13,6 @@ Serves all static files from the project root, plus:
 import json
 import mimetypes
 import os
-import re
 import shutil
 import subprocess
 import sys
@@ -146,186 +145,48 @@ def suggest_slide(slide_num):
     return suggestions
 
 
-def apply_overrides(overrides):
+def deep_merge(base, over):
+    out = dict(base)
+    for key, value in over.items():
+        if isinstance(value, dict) and isinstance(out.get(key), dict):
+            out[key] = deep_merge(out[key], value)
+        else:
+            out[key] = value
+    return out
+
+
+def apply_overrides(incoming):
+    """Persist edits to overrides.json and rebuild the resolved composition.
+
+    Generated artifacts (metadata.json, narration_script.md) are never
+    mutated. Edits accumulate in overrides.json; build_composition.py applies
+    them on top of the pristine generated data to produce composition.json.
+    """
     logs = []
+    log_info(f"Received overrides for {len(incoming)} slide(s)")
 
-    log_info(f"Received overrides for {len(overrides)} slide(s)")
-
-    # ── 0. Save overrides to pipeline_state.json ───────────────────────
-    state_path = TASK / "pipeline_state.json"
-    write_json(state_path, overrides)
-    logs.append(f"Saved overrides to pipeline_state.json")
-
-    for key, ov in overrides.items():
-        if ov.get("notes"):
+    # ── Accumulate edits into overrides.json (deep-merged) ─────────────
+    ov_path = TASK / "overrides.json"
+    merged = deep_merge(load_json(ov_path) or {}, incoming)
+    write_json(ov_path, merged)
+    logs.append("Saved edits to overrides.json (generated artifacts untouched)")
+    for key, ov in incoming.items():
+        if isinstance(ov, dict) and ov.get("notes"):
             logs.append(f"[{key}] notes: {ov['notes'][:120]}")
             log_info(f"  {key}: notes present")
 
-    log_info("Step 1/4: Updating narration_script.md ...")
-    # ── 1. Update narration_script.md ──────────────────────────────────
-    nar_path = TASK / "narration" / "narration_script.md"
-    if nar_path.exists():
-        text = nar_path.read_text(encoding="utf-8")
-        changed = False
-        for key, ov in overrides.items():
-            narration = ov.get("narration")
-            if not narration:
-                continue
-            m = re.match(r"slide_(\d+)", key)
-            if not m:
-                continue
-            n = int(m.group(1))
-            old = re.search(
-                rf"^## Slide {n}\b[^\n]*\n+(.*?)(?=^## Slide |\Z)", text, re.M | re.S
-            )
-            if old:
-                text = text[: old.start()] + f"## Slide {n:02d}\n\n{narration}\n" + text[old.end() :]
-                changed = True
-        if changed:
-            nar_path.write_text(text, encoding="utf-8")
-            logs.append(f"Updated narration_script.md")
-
-    log_info("Step 2/4: Patching metadata.json ...")
-    # ── 2. Patch metadata.json for each slide with layer overrides ─────
-    for key, ov in overrides.items():
-        layer_ovs = ov.get("layers")
-        if not layer_ovs:
-            continue
-        m = re.match(r"slide_(\d+)", key)
-        if not m:
-            continue
-        n = int(m.group(1))
-        meta_path = TASK / "output" / f"slide_{n:02d}" / "metadata.json"
-        meta = load_json(meta_path)
-        if not meta:
-            continue
-        patched = False
-        for layer in meta.get("layers", []):
-            lo = layer_ovs.get(layer["name"])
-            if not lo:
-                continue
-            if lo.get("start") is not None:
-                layer["start"] = lo["start"]
-                patched = True
-            if lo.get("duration") is not None:
-                layer["duration"] = lo["duration"]
-                patched = True
-            if lo.get("animation") is not None:
-                layer["animation"] = lo["animation"]
-                patched = True
-        if patched:
-            write_json(meta_path, meta)
-            logs.append(f"Patched metadata slide {n:02d}")
-
-    log_info("Step 3/4: Re-running TTS ...")
-    # ── 3. Re-run TTS if any narration changed ─────────────────────────
-    narration_changed = any(ov.get("narration") for ov in overrides.values())
-    if narration_changed:
-        tts_script = SKILL_DIR / "tts_edge.py"
-        if tts_script.exists():
-            r = run_python(tts_script, "zh-TW-YunJheNeural", "+0%")
-            logs.append(f"TTS: {r.stdout.strip() or '(ok)'}")
-            if r.returncode:
-                logs.append(f"TTS error: {redact(r.stderr.strip())}")
-        else:
-            logs.append(f"TTS script not found at {tts_script}")
-
-    log_info("Step 4/4: Rebuilding timeline ...")
-    build_script = SKILL_DIR / "build_timeline.py"
+    # ── Rebuild the resolved contract (overrides applied here) ─────────
+    log_info("Rebuilding composition.json ...")
+    build_script = SKILL_DIR / "build_composition.py"
     if build_script.exists():
         r = run_python(build_script)
-        logs.append(f"Timeline: {r.stdout.strip()}")
+        logs.append(f"composition.json: {r.stdout.strip() or '(ok)'}")
         if r.returncode:
-            logs.append(f"Timeline error: {redact(r.stderr.strip())}")
+            logs.append(f"composition error: {redact(r.stderr.strip())}")
     else:
-        logs.append(f"Build script not found at {build_script}")
-
-    # ── 5. Auto-process adjustment notes ───────────────────────────────
-    rebuilt = False
-    for key, ov in overrides.items():
-        note = (ov.get("notes") or "").strip()
-        if not note:
-            continue
-        logs.append(f"---")
-        logs.append(f"Processing notes for {key}: \"{note[:80]}\"")
-        actions, did_tts = auto_process_note(note, key, logs)
-        for a in actions:
-            logs.append(f"  → {a}")
-        if not actions:
-            logs.append(f"  → (no rules matched — tell the agent in chat)")
-        if did_tts:
-            rebuilt = True
-
-    if rebuilt:
-        log_info("Rebuilding timeline after auto-processed notes ...")
-        build_script = SKILL_DIR / "build_timeline.py"
-        if build_script.exists():
-            r = run_python(build_script)
-            logs.append(f"Timeline (post-notes): {r.stdout.strip()}")
-            if r.returncode:
-                logs.append(f"Timeline error: {redact(r.stderr.strip())}")
+        logs.append(f"build_composition.py not found at {build_script}")
 
     return logs
-
-
-def auto_process_note(note, slide_key, logs):
-    """Simple keyword-based processing for common requests.
-    Returns (actions, did_tts)."""
-    actions = []
-    did_tts = False
-    nl = note.lower()
-    tts = SKILL_DIR / "tts_edge.py"
-
-    if re.search(r"慢一点|慢一點|slower|slow\s*down", nl):
-        actions.append("Detected: slow down narration → re-running TTS at -10%")
-        if tts.exists():
-            r = run_python(tts, "zh-TW-YunJheNeural", "-10%")
-            actions.append(f"TTS: {r.stdout.strip() or '(ok)'}")
-            did_tts = True
-        return actions, did_tts
-
-    if re.search(r"快一点|快一點|faster|speed\s*up", nl):
-        actions.append("Detected: speed up narration → re-running TTS at +10%")
-        if tts.exists():
-            r = run_python(tts, "zh-TW-YunJheNeural", "+10%")
-            actions.append(f"TTS: {r.stdout.strip() or '(ok)'}")
-            did_tts = True
-        return actions, did_tts
-
-    if re.search(r"正常速|normal\s*speed", nl):
-        actions.append("Detected: normal speed → re-running TTS at -5%")
-        if tts.exists():
-            r = run_python(tts, "zh-TW-YunJheNeural", "-5%")
-            actions.append(f"TTS: {r.stdout.strip() or '(ok)'}")
-            did_tts = True
-        return actions, did_tts
-
-    if re.search(r"换(?:成|为)?.*[男女]声|change\s*voice|换声音", nl):
-        actions.append("Detected: voice change request → re-running TTS")
-        if tts.exists():
-            r = run_python(tts, "zh-TW-YunJheNeural", "+0%")
-            actions.append(f"TTS: {r.stdout.strip() or '(ok)'}")
-            did_tts = True
-        return actions, did_tts
-
-    if re.search(r"first|appear\s*first|先进[场場]|先出現|先進場", nl):
-        actions.append("Detected: animation order request")
-        m = re.search(r"slide\s*(\d+)", nl)
-        if m:
-            sn = int(m.group(1))
-            meta_path = TASK / "output" / f"slide_{sn:02d}" / "metadata.json"
-            meta = load_json(meta_path)
-            if meta:
-                if re.search(r"title|标题|標題", nl):
-                    for l in meta.get("layers", []):
-                        if l.get("type") == "title":
-                            l["z_index"] = 0
-                            l["start"] = 0.45
-                            actions.append(f"→ force {l['name']} first (z=0)")
-                    write_json(meta_path, meta)
-        return actions, did_tts
-
-    return actions, did_tts
 
 
 def render_slides(slide_from, slide_to):
