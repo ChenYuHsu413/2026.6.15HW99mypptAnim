@@ -1,0 +1,1586 @@
+{
+  "canvas": {
+    "aspect": "16:9",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30
+  },
+  "transition": {
+    "type": "crossfade",
+    "duration": 0.5
+  },
+  "caption_style": {
+    "font": "Microsoft JhengHei",
+    "size": 11,
+    "primary_colour": "&H00FFFFFF",
+    "back_colour": "&H66000000",
+    "border_style": 3,
+    "outline": 8,
+    "shadow": 0,
+    "margins": [
+      30,
+      30,
+      10
+    ],
+    "letterbox_height": 960,
+    "band_color": "0x101010",
+    "chunk_max_chars": 32,
+    "tail_silence": 0.35
+  },
+  "slides": [
+    {
+      "index": 1,
+      "background": "output/slide_01/background.png",
+      "audio": "audio/slide_01_voiceover.mp3",
+      "start": 0.0,
+      "end": 12.62,
+      "duration": 12.62,
+      "narration": "歡迎來到學術論文寫作全指南。論文寫作不是藝術，而是系統工程。這套課程將帶你掌握從 A 到 Z 的完美架構，把你的寫作流程升級為精準的偵錯模式，也就是 Debug Mode。",
+      "layers": [
+        {
+          "id": "s01-title-01",
+          "image": "output/slide_01/slide_01_title_01.png",
+          "bbox": [
+            296,
+            285,
+            1327,
+            141
+          ],
+          "z": 5,
+          "enter": {
+            "type": "fade-in-down",
+            "intensity": 1.0
+          },
+          "start": 0.45,
+          "duration": 0.7
+        },
+        {
+          "id": "s01-table-01",
+          "image": "output/slide_01/slide_01_table_01.png",
+          "bbox": [
+            216,
+            152,
+            1488,
+            656
+          ],
+          "z": 6,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 3.05,
+          "duration": 0.7
+        },
+        {
+          "id": "s01-text-block-01",
+          "image": "output/slide_01/slide_01_text_block_01.png",
+          "bbox": [
+            294,
+            527,
+            1332,
+            83
+          ],
+          "z": 7,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 5.66,
+          "duration": 0.7
+        },
+        {
+          "id": "s01-illustration-01",
+          "image": "output/slide_01/slide_01_illustration_01.png",
+          "bbox": [
+            295,
+            850,
+            965,
+            115
+          ],
+          "z": 8,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 8.26,
+          "duration": 0.7
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "background": "output/slide_02/background.png",
+      "audio": "audio/slide_02_voiceover.mp3",
+      "start": 13.12,
+      "end": 33.66,
+      "duration": 20.54,
+      "narration": "為什麼你的論文會被拒絕？從審稿委員的視角來看，這不是觀點差異，而是編譯失敗。常見的錯誤包括：動機不明、圖表與數學對不上、以及最新技術比較太薄弱。解決方案，就是套用 A 到 Z 架構作為你的偵錯模式，像工程師排查系統錯誤一樣，精準找出論文中缺失的邏輯節點。",
+      "layers": [
+        {
+          "id": "s02-table-01",
+          "image": "output/slide_02/slide_02_table_01.png",
+          "bbox": [
+            27,
+            27,
+            905,
+            930
+          ],
+          "z": 5,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 0.45,
+          "duration": 0.7
+        },
+        {
+          "id": "s02-annotation-01",
+          "image": "output/slide_02/slide_02_annotation_01.png",
+          "bbox": [
+            261,
+            311,
+            447,
+            191
+          ],
+          "z": 6,
+          "enter": {
+            "type": "fade-in",
+            "intensity": 1.0
+          },
+          "start": 1.3,
+          "duration": 0.7
+        },
+        {
+          "id": "s02-table-02",
+          "image": "output/slide_02/slide_02_table_02.png",
+          "bbox": [
+            989,
+            27,
+            905,
+            930
+          ],
+          "z": 7,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 9.62,
+          "duration": 0.7
+        },
+        {
+          "id": "s02-illustration-01",
+          "image": "output/slide_02/slide_02_illustration_01.png",
+          "bbox": [
+            30,
+            957,
+            1878,
+            109
+          ],
+          "z": 8,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 14.2,
+          "duration": 0.7
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "background": "output/slide_03/background.png",
+      "audio": "audio/slide_03_voiceover.mp3",
+      "start": 34.16,
+      "end": 51.39,
+      "duration": 17.23,
+      "narration": "整個系統架構由六大核心編譯模組組成。A 到 F 是摘要與動機，G 到 L 是簡介，M 到 O 是相關研究，PA 到 PM 是提出方法與系統，Q 到 V 是模擬與實驗，最後 W 到 Z 是結論與未來。每一份完美的論文，都能無縫對應這二十六個邏輯字母。",
+      "layers": [
+        {
+          "id": "s03-title-01",
+          "image": "output/slide_03/slide_03_title_01.png",
+          "bbox": [
+            103,
+            100,
+            1031,
+            67
+          ],
+          "z": 5,
+          "enter": {
+            "type": "fade-in-down",
+            "intensity": 1.0
+          },
+          "start": 0.45,
+          "duration": 0.7
+        },
+        {
+          "id": "s03-illustration-01",
+          "image": "output/slide_03/slide_03_illustration_01.png",
+          "bbox": [
+            100,
+            277,
+            1721,
+            110
+          ],
+          "z": 6,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 2.12,
+          "duration": 0.7
+        },
+        {
+          "id": "s03-key-point-card-01",
+          "image": "output/slide_03/slide_03_key_point_card_01.png",
+          "bbox": [
+            97,
+            400,
+            250,
+            280
+          ],
+          "z": 7,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 3.79,
+          "duration": 0.7
+        },
+        {
+          "id": "s03-key-point-card-02",
+          "image": "output/slide_03/slide_03_key_point_card_02.png",
+          "bbox": [
+            347,
+            400,
+            294,
+            280
+          ],
+          "z": 8,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 5.46,
+          "duration": 0.7
+        },
+        {
+          "id": "s03-key-point-card-03",
+          "image": "output/slide_03/slide_03_key_point_card_03.png",
+          "bbox": [
+            641,
+            400,
+            295,
+            280
+          ],
+          "z": 9,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 7.13,
+          "duration": 0.7
+        },
+        {
+          "id": "s03-key-point-card-04",
+          "image": "output/slide_03/slide_03_key_point_card_04.png",
+          "bbox": [
+            980,
+            387,
+            251,
+            299
+          ],
+          "z": 10,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 8.8,
+          "duration": 0.7
+        },
+        {
+          "id": "s03-key-point-card-05",
+          "image": "output/slide_03/slide_03_key_point_card_05.png",
+          "bbox": [
+            1279,
+            400,
+            251,
+            280
+          ],
+          "z": 11,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 10.47,
+          "duration": 0.7
+        },
+        {
+          "id": "s03-key-point-card-06",
+          "image": "output/slide_03/slide_03_key_point_card_06.png",
+          "bbox": [
+            1530,
+            400,
+            293,
+            280
+          ],
+          "z": 12,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 12.14,
+          "duration": 0.7
+        },
+        {
+          "id": "s03-key-point-card-07",
+          "image": "output/slide_03/slide_03_key_point_card_07.png",
+          "bbox": [
+            1195,
+            939,
+            671,
+            95
+          ],
+          "z": 13,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 13.81,
+          "duration": 0.7
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "background": "output/slide_04/background.png",
+      "audio": "audio/slide_04_voiceover.mp3",
+      "start": 51.89,
+      "end": 73.13,
+      "duration": 21.24,
+      "narration": "第一個模組是 The Hook Engine，負責摘要與動機。A 是引人注意，題目必須有趣、重要、創新；B 是界定挑戰，明確點出正面臨的問題；C 是提出解法；D 是方法設計；E 是實驗評估；F 是關鍵發現。偵錯重點：你的題目是否同時具備三大必備元素？挑戰與解法是否直接對應？",
+      "layers": [
+        {
+          "id": "s04-title-01",
+          "image": "output/slide_04/slide_04_title_01.png",
+          "bbox": [
+            84,
+            79,
+            1405,
+            63
+          ],
+          "z": 5,
+          "enter": {
+            "type": "fade-in-down",
+            "intensity": 1.0
+          },
+          "start": 0.45,
+          "duration": 0.7
+        },
+        {
+          "id": "s04-icon-01",
+          "image": "output/slide_04/slide_04_icon_01.png",
+          "bbox": [
+            164,
+            331,
+            129,
+            135
+          ],
+          "z": 6,
+          "enter": {
+            "type": "pop-in",
+            "intensity": 1.0
+          },
+          "start": 1.81,
+          "duration": 0.7
+        },
+        {
+          "id": "s04-illustration-01",
+          "image": "output/slide_04/slide_04_illustration_01.png",
+          "bbox": [
+            100,
+            505,
+            292,
+            220
+          ],
+          "z": 7,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 3.17,
+          "duration": 0.7
+        },
+        {
+          "id": "s04-icon-02",
+          "image": "output/slide_04/slide_04_icon_02.png",
+          "bbox": [
+            472,
+            331,
+            107,
+            135
+          ],
+          "z": 8,
+          "enter": {
+            "type": "pop-in",
+            "intensity": 1.0
+          },
+          "start": 4.53,
+          "duration": 0.7
+        },
+        {
+          "id": "s04-illustration-02",
+          "image": "output/slide_04/slide_04_illustration_02.png",
+          "bbox": [
+            392,
+            505,
+            290,
+            182
+          ],
+          "z": 9,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 5.89,
+          "duration": 0.7
+        },
+        {
+          "id": "s04-icon-03",
+          "image": "output/slide_04/slide_04_icon_03.png",
+          "bbox": [
+            755,
+            329,
+            118,
+            138
+          ],
+          "z": 10,
+          "enter": {
+            "type": "pop-in",
+            "intensity": 1.0
+          },
+          "start": 7.25,
+          "duration": 0.7
+        },
+        {
+          "id": "s04-illustration-03",
+          "image": "output/slide_04/slide_04_illustration_03.png",
+          "bbox": [
+            670,
+            505,
+            237,
+            182
+          ],
+          "z": 11,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 8.61,
+          "duration": 0.7
+        },
+        {
+          "id": "s04-icon-04",
+          "image": "output/slide_04/slide_04_icon_04.png",
+          "bbox": [
+            1048,
+            332,
+            116,
+            134
+          ],
+          "z": 12,
+          "enter": {
+            "type": "pop-in",
+            "intensity": 1.0
+          },
+          "start": 9.97,
+          "duration": 0.7
+        },
+        {
+          "id": "s04-illustration-04",
+          "image": "output/slide_04/slide_04_illustration_04.png",
+          "bbox": [
+            985,
+            532,
+            221,
+            159
+          ],
+          "z": 13,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 11.33,
+          "duration": 0.7
+        },
+        {
+          "id": "s04-icon-05",
+          "image": "output/slide_04/slide_04_icon_05.png",
+          "bbox": [
+            1346,
+            331,
+            99,
+            135
+          ],
+          "z": 14,
+          "enter": {
+            "type": "pop-in",
+            "intensity": 1.0
+          },
+          "start": 12.69,
+          "duration": 0.7
+        },
+        {
+          "id": "s04-illustration-05",
+          "image": "output/slide_04/slide_04_illustration_05.png",
+          "bbox": [
+            1275,
+            531,
+            242,
+            160
+          ],
+          "z": 15,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 14.05,
+          "duration": 0.7
+        },
+        {
+          "id": "s04-icon-06",
+          "image": "output/slide_04/slide_04_icon_06.png",
+          "bbox": [
+            1637,
+            331,
+            95,
+            135
+          ],
+          "z": 16,
+          "enter": {
+            "type": "pop-in",
+            "intensity": 1.0
+          },
+          "start": 15.41,
+          "duration": 0.7
+        },
+        {
+          "id": "s04-illustration-06",
+          "image": "output/slide_04/slide_04_illustration_06.png",
+          "bbox": [
+            1566,
+            531,
+            243,
+            160
+          ],
+          "z": 17,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 16.77,
+          "duration": 0.7
+        },
+        {
+          "id": "s04-key-point-card-01",
+          "image": "output/slide_04/slide_04_key_point_card_01.png",
+          "bbox": [
+            90,
+            823,
+            1740,
+            160
+          ],
+          "z": 18,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 18.13,
+          "duration": 0.7
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "background": "output/slide_05/background.png",
+      "audio": "audio/slide_05_voiceover.mp3",
+      "start": 73.63,
+      "end": 92.52,
+      "duration": 18.89,
+      "narration": "第二個模組是 Background Process，也就是簡介。它把摘要 A 到 F 的重點，進行長篇幅的詳細延伸。G 是現況與背景，H 是面臨的挑戰，I 是文獻分類，J 是優缺點評論，K 是重申亮點，L 是結構安排。偵錯重點：你的大趨勢與特定挑戰，是不是有清晰的分野？",
+      "layers": [
+        {
+          "id": "s05-title-01",
+          "image": "output/slide_05/slide_05_title_01.png",
+          "bbox": [
+            239,
+            70,
+            1443,
+            125
+          ],
+          "z": 5,
+          "enter": {
+            "type": "fade-in-down",
+            "intensity": 1.0
+          },
+          "start": 0.45,
+          "duration": 0.7
+        },
+        {
+          "id": "s05-key-point-card-01",
+          "image": "output/slide_05/slide_05_key_point_card_01.png",
+          "bbox": [
+            797,
+            232,
+            1074,
+            115
+          ],
+          "z": 6,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 2.54,
+          "duration": 0.7
+        },
+        {
+          "id": "s05-key-point-card-02",
+          "image": "output/slide_05/slide_05_key_point_card_02.png",
+          "bbox": [
+            797,
+            352,
+            1074,
+            116
+          ],
+          "z": 7,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 4.62,
+          "duration": 0.7
+        },
+        {
+          "id": "s05-key-point-card-03",
+          "image": "output/slide_05/slide_05_key_point_card_03.png",
+          "bbox": [
+            797,
+            473,
+            1074,
+            115
+          ],
+          "z": 8,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 6.71,
+          "duration": 0.7
+        },
+        {
+          "id": "s05-key-point-card-04",
+          "image": "output/slide_05/slide_05_key_point_card_04.png",
+          "bbox": [
+            797,
+            593,
+            1074,
+            116
+          ],
+          "z": 9,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 8.79,
+          "duration": 0.7
+        },
+        {
+          "id": "s05-key-point-card-05",
+          "image": "output/slide_05/slide_05_key_point_card_05.png",
+          "bbox": [
+            797,
+            714,
+            1074,
+            115
+          ],
+          "z": 10,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 10.88,
+          "duration": 0.7
+        },
+        {
+          "id": "s05-key-point-card-06",
+          "image": "output/slide_05/slide_05_key_point_card_06.png",
+          "bbox": [
+            50,
+            858,
+            704,
+            171
+          ],
+          "z": 11,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 12.97,
+          "duration": 0.7
+        },
+        {
+          "id": "s05-key-point-card-07",
+          "image": "output/slide_05/slide_05_key_point_card_07.png",
+          "bbox": [
+            797,
+            834,
+            1074,
+            115
+          ],
+          "z": 12,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 15.05,
+          "duration": 0.7
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "background": "output/slide_06/background.png",
+      "audio": "audio/slide_06_voiceover.mp3",
+      "start": 93.02,
+      "end": 115.6,
+      "duration": 22.58,
+      "narration": "第三個模組是 The Battleground，相關研究。M 是技術演進與分類，描述演進軌跡，從舊屬性到新屬性、從簡單到複雜。N 是新方法的優勢，點出新趨勢與新創見，明確交代你的方法如何戰勝舊有方法。O 是圖表統整，歸納為結構化的比較陣列。記住，不要只是列舉論文，要審判論文，以突顯自身優勢。",
+      "layers": [
+        {
+          "id": "s06-title-01",
+          "image": "output/slide_06/slide_06_title_01.png",
+          "bbox": [
+            228,
+            69,
+            1465,
+            67
+          ],
+          "z": 5,
+          "enter": {
+            "type": "fade-in-down",
+            "intensity": 1.0
+          },
+          "start": 0.45,
+          "duration": 0.7
+        },
+        {
+          "id": "s06-key-point-card-01",
+          "image": "output/slide_06/slide_06_key_point_card_01.png",
+          "bbox": [
+            437,
+            196,
+            1046,
+            235
+          ],
+          "z": 6,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 3.36,
+          "duration": 0.7
+        },
+        {
+          "id": "s06-key-point-card-02",
+          "image": "output/slide_06/slide_06_key_point_card_02.png",
+          "bbox": [
+            625,
+            431,
+            670,
+            273
+          ],
+          "z": 7,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 6.27,
+          "duration": 0.7
+        },
+        {
+          "id": "s06-key-point-card-03",
+          "image": "output/slide_06/slide_06_key_point_card_03.png",
+          "bbox": [
+            781,
+            415,
+            359,
+            97
+          ],
+          "z": 8,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 9.18,
+          "duration": 0.7
+        },
+        {
+          "id": "s06-illustration-01",
+          "image": "output/slide_06/slide_06_illustration_01.png",
+          "bbox": [
+            1422,
+            448,
+            409,
+            225
+          ],
+          "z": 9,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 12.1,
+          "duration": 0.7
+        },
+        {
+          "id": "s06-arrow-01",
+          "image": "output/slide_06/slide_06_arrow_01.png",
+          "bbox": [
+            920,
+            704,
+            143,
+            70
+          ],
+          "z": 10,
+          "enter": {
+            "type": "wipe-in",
+            "intensity": 1.0
+          },
+          "start": 15.01,
+          "duration": 0.7
+        },
+        {
+          "id": "s06-key-point-card-04",
+          "image": "output/slide_06/slide_06_key_point_card_04.png",
+          "bbox": [
+            767,
+            774,
+            386,
+            254
+          ],
+          "z": 11,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 17.92,
+          "duration": 0.7
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "background": "output/slide_07/background.png",
+      "audio": "audio/slide_07_voiceover.mp3",
+      "start": 116.1,
+      "end": 129.18,
+      "duration": 13.08,
+      "narration": "這是 O-Organize 的診斷視圖。審稿人最愛看這張表：用圈叉圖把優缺點評論視覺化，從特徵提取、運算效率、資料需求到收斂速度，一秒證明你提出的新方法，完勝所有舊方法。",
+      "layers": [
+        {
+          "id": "s07-title-01",
+          "image": "output/slide_07/slide_07_title_01.png",
+          "bbox": [
+            305,
+            74,
+            1316,
+            62
+          ],
+          "z": 5,
+          "enter": {
+            "type": "fade-in-down",
+            "intensity": 1.0
+          },
+          "start": 0.45,
+          "duration": 0.7
+        },
+        {
+          "id": "s07-table-01",
+          "image": "output/slide_07/slide_07_table_01.png",
+          "bbox": [
+            278,
+            198,
+            1364,
+            478
+          ],
+          "z": 6,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 3.17,
+          "duration": 0.7
+        },
+        {
+          "id": "s07-illustration-01",
+          "image": "output/slide_07/slide_07_illustration_01.png",
+          "bbox": [
+            281,
+            676,
+            1358,
+            111
+          ],
+          "z": 7,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 5.89,
+          "duration": 0.7
+        },
+        {
+          "id": "s07-illustration-02",
+          "image": "output/slide_07/slide_07_illustration_02.png",
+          "bbox": [
+            52,
+            836,
+            1641,
+            191
+          ],
+          "z": 8,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 8.61,
+          "duration": 0.7
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "background": "output/slide_08/background.png",
+      "audio": "audio/slide_08_voiceover.mp3",
+      "start": 129.68,
+      "end": 152.72,
+      "duration": 23.04,
+      "narration": "第四個模組是核心架構，提出方法與系統。它分成四大區塊：Intent 是目標與背景，包含確立目標、背景基礎與解法原理；Design 是架構拆解，涵蓋架構設計、系統重要元素與元素功能；Mechanics 是互動與實作，包括架構圖、如何達成目標與流程實作；Proof 則是驗證與貢獻，提供具體範例、重申貢獻、後續模擬預告與數學證明。",
+      "layers": [
+        {
+          "id": "s08-title-01",
+          "image": "output/slide_08/slide_08_title_01.png",
+          "bbox": [
+            55,
+            38,
+            1694,
+            61
+          ],
+          "z": 5,
+          "enter": {
+            "type": "fade-in-down",
+            "intensity": 1.0
+          },
+          "start": 0.45,
+          "duration": 0.7
+        },
+        {
+          "id": "s08-key-point-card-01",
+          "image": "output/slide_08/slide_08_key_point_card_01.png",
+          "bbox": [
+            87,
+            183,
+            627,
+            274
+          ],
+          "z": 6,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 3.92,
+          "duration": 0.7
+        },
+        {
+          "id": "s08-key-point-card-02",
+          "image": "output/slide_08/slide_08_key_point_card_02.png",
+          "bbox": [
+            1206,
+            183,
+            627,
+            274
+          ],
+          "z": 7,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 7.4,
+          "duration": 0.7
+        },
+        {
+          "id": "s08-key-point-card-03",
+          "image": "output/slide_08/slide_08_key_point_card_03.png",
+          "bbox": [
+            823,
+            231,
+            275,
+            450
+          ],
+          "z": 8,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 10.87,
+          "duration": 0.7
+        },
+        {
+          "id": "s08-key-point-card-04",
+          "image": "output/slide_08/slide_08_key_point_card_04.png",
+          "bbox": [
+            87,
+            663,
+            722,
+            367
+          ],
+          "z": 9,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 14.34,
+          "duration": 0.7
+        },
+        {
+          "id": "s08-key-point-card-05",
+          "image": "output/slide_08/slide_08_key_point_card_05.png",
+          "bbox": [
+            1206,
+            663,
+            627,
+            367
+          ],
+          "z": 10,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 17.82,
+          "duration": 0.7
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "background": "output/slide_09/background.png",
+      "audio": "audio/slide_09_voiceover.mp3",
+      "start": 153.22,
+      "end": 171.31,
+      "duration": 18.09,
+      "narration": "進入 Debugger Mode，檢查系統架構的連貫性。掃描一：你的架構圖中的每一個元件，是否都在實作細節中有明確對應？掃描二：數學公式是否完全支撐你宣稱的解法運作邏輯？最致命的錯誤是：圖表畫了一套，程式碼寫了另一套，公式完全無關。",
+      "layers": [
+        {
+          "id": "s09-title-01",
+          "image": "output/slide_09/slide_09_title_01.png",
+          "bbox": [
+            60,
+            50,
+            740,
+            64
+          ],
+          "z": 5,
+          "enter": {
+            "type": "fade-in-down",
+            "intensity": 1.0
+          },
+          "start": 0.45,
+          "duration": 0.7
+        },
+        {
+          "id": "s09-text-block-01",
+          "image": "output/slide_09/slide_09_text_block_01.png",
+          "bbox": [
+            1022,
+            156,
+            354,
+            91
+          ],
+          "z": 6,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 2.72,
+          "duration": 0.7
+        },
+        {
+          "id": "s09-text-block-02",
+          "image": "output/slide_09/slide_09_text_block_02.png",
+          "bbox": [
+            148,
+            582,
+            491,
+            91
+          ],
+          "z": 7,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 4.99,
+          "duration": 0.7
+        },
+        {
+          "id": "s09-text-block-03",
+          "image": "output/slide_09/slide_09_text_block_03.png",
+          "bbox": [
+            1286,
+            582,
+            369,
+            91
+          ],
+          "z": 8,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 7.26,
+          "duration": 0.7
+        },
+        {
+          "id": "s09-illustration-01",
+          "image": "output/slide_09/slide_09_illustration_01.png",
+          "bbox": [
+            77,
+            786,
+            1104,
+            100
+          ],
+          "z": 9,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 9.53,
+          "duration": 0.7
+        },
+        {
+          "id": "s09-text-block-04",
+          "image": "output/slide_09/slide_09_text_block_04.png",
+          "bbox": [
+            77,
+            928,
+            1104,
+            72
+          ],
+          "z": 10,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 11.8,
+          "duration": 0.7
+        },
+        {
+          "id": "s09-illustration-02",
+          "image": "output/slide_09/slide_09_illustration_02.png",
+          "bbox": [
+            1195,
+            790,
+            658,
+            219
+          ],
+          "z": 11,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 14.07,
+          "duration": 0.7
+        }
+      ]
+    },
+    {
+      "index": 10,
+      "background": "output/slide_10/background.png",
+      "audio": "audio/slide_10_voiceover.mp3",
+      "start": 171.81,
+      "end": 192.42,
+      "duration": 20.61,
+      "narration": "第五個模組是 The Stress Test，模擬與實驗。定性指標展示方法在性質上的絕對優勢，例如收斂快速、需要的資料量較少；定量指標展示數量上的具體成果，例如準確率等具體數據。流程上，先與最先進技術進行比較，再詳細交代實驗設定與參數調整，最後展示有用結果並驗證系統有效性。",
+      "layers": [
+        {
+          "id": "s10-title-01",
+          "image": "output/slide_10/slide_10_title_01.png",
+          "bbox": [
+            54,
+            38,
+            1132,
+            62
+          ],
+          "z": 5,
+          "enter": {
+            "type": "fade-in-down",
+            "intensity": 1.0
+          },
+          "start": 0.45,
+          "duration": 0.7
+        },
+        {
+          "id": "s10-key-point-card-01",
+          "image": "output/slide_10/slide_10_key_point_card_01.png",
+          "bbox": [
+            87,
+            183,
+            850,
+            530
+          ],
+          "z": 6,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 3.52,
+          "duration": 0.7
+        },
+        {
+          "id": "s10-key-point-card-02",
+          "image": "output/slide_10/slide_10_key_point_card_02.png",
+          "bbox": [
+            983,
+            183,
+            850,
+            530
+          ],
+          "z": 7,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 6.59,
+          "duration": 0.7
+        },
+        {
+          "id": "s10-key-point-card-03",
+          "image": "output/slide_10/slide_10_key_point_card_03.png",
+          "bbox": [
+            87,
+            792,
+            531,
+            210
+          ],
+          "z": 8,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 9.65,
+          "duration": 0.7
+        },
+        {
+          "id": "s10-key-point-card-04",
+          "image": "output/slide_10/slide_10_key_point_card_04.png",
+          "bbox": [
+            696,
+            792,
+            529,
+            210
+          ],
+          "z": 9,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 12.72,
+          "duration": 0.7
+        },
+        {
+          "id": "s10-key-point-card-05",
+          "image": "output/slide_10/slide_10_key_point_card_05.png",
+          "bbox": [
+            1303,
+            792,
+            530,
+            210
+          ],
+          "z": 10,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 15.79,
+          "duration": 0.7
+        }
+      ]
+    },
+    {
+      "index": 11,
+      "background": "output/slide_11/background.png",
+      "audio": "audio/slide_11_voiceover.mp3",
+      "start": 192.92,
+      "end": 215.41,
+      "duration": 22.49,
+      "narration": "最後一個模組是 The Output Log，結論與未來工作。W 是整體回顧，重新盤點研究情境與欲解決的問題；X 是專精優勢，點出演算法最核心的問題；Y 是具體產出，驗證模擬結果中最厲害的數據與性質優勢；Z 是終極展望，總結研發貢獻並提出未來研究方向。注意，結論 Z 要完美回應開頭的動機 A，這是一個閉環系統。",
+      "layers": [
+        {
+          "id": "s11-title-01",
+          "image": "output/slide_11/slide_11_title_01.png",
+          "bbox": [
+            80,
+            61,
+            1595,
+            76
+          ],
+          "z": 5,
+          "enter": {
+            "type": "fade-in-down",
+            "intensity": 1.0
+          },
+          "start": 0.45,
+          "duration": 0.7
+        },
+        {
+          "id": "s11-arrow-01",
+          "image": "output/slide_11/slide_11_arrow_01.png",
+          "bbox": [
+            889,
+            183,
+            174,
+            24
+          ],
+          "z": 6,
+          "enter": {
+            "type": "wipe-in",
+            "intensity": 1.0
+          },
+          "start": 2.99,
+          "duration": 0.7
+        },
+        {
+          "id": "s11-arrow-02",
+          "image": "output/slide_11/slide_11_arrow_02.png",
+          "bbox": [
+            176,
+            506,
+            206,
+            75
+          ],
+          "z": 7,
+          "enter": {
+            "type": "wipe-in",
+            "intensity": 1.0
+          },
+          "start": 5.52,
+          "duration": 0.7
+        },
+        {
+          "id": "s11-illustration-01",
+          "image": "output/slide_11/slide_11_illustration_01.png",
+          "bbox": [
+            657,
+            505,
+            255,
+            141
+          ],
+          "z": 8,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 8.06,
+          "duration": 0.7
+        },
+        {
+          "id": "s11-illustration-02",
+          "image": "output/slide_11/slide_11_illustration_02.png",
+          "bbox": [
+            1481,
+            506,
+            335,
+            108
+          ],
+          "z": 9,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 10.59,
+          "duration": 0.7
+        },
+        {
+          "id": "s11-key-point-card-01",
+          "image": "output/slide_11/slide_11_key_point_card_01.png",
+          "bbox": [
+            55,
+            858,
+            659,
+            174
+          ],
+          "z": 10,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 13.13,
+          "duration": 0.7
+        },
+        {
+          "id": "s11-illustration-03",
+          "image": "output/slide_11/slide_11_illustration_03.png",
+          "bbox": [
+            936,
+            904,
+            302,
+            102
+          ],
+          "z": 11,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 15.67,
+          "duration": 0.7
+        },
+        {
+          "id": "s11-illustration-04",
+          "image": "output/slide_11/slide_11_illustration_04.png",
+          "bbox": [
+            1334,
+            805,
+            274,
+            134
+          ],
+          "z": 12,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 18.2,
+          "duration": 0.7
+        }
+      ]
+    },
+    {
+      "index": 12,
+      "background": "output/slide_12/background.png",
+      "audio": "audio/slide_12_voiceover.mp3",
+      "start": 215.91,
+      "end": 231.12,
+      "duration": 15.21,
+      "narration": "這是完整的系統總覽：A 到 Z 偵錯清單。從摘要、簡介、相關研究、提出方法、模擬實驗到結論，二十六個邏輯節點一字排開。送出論文之前的最後掃描：這二十六個邏輯節點，是否全數亮起綠燈？",
+      "layers": [
+        {
+          "id": "s12-title-01",
+          "image": "output/slide_12/slide_12_title_01.png",
+          "bbox": [
+            73,
+            37,
+            1039,
+            69
+          ],
+          "z": 5,
+          "enter": {
+            "type": "fade-in-down",
+            "intensity": 1.0
+          },
+          "start": 0.45,
+          "duration": 0.7
+        },
+        {
+          "id": "s12-table-01",
+          "image": "output/slide_12/slide_12_table_01.png",
+          "bbox": [
+            55,
+            151,
+            1810,
+            817
+          ],
+          "z": 6,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 4.79,
+          "duration": 0.7
+        },
+        {
+          "id": "s12-text-block-01",
+          "image": "output/slide_12/slide_12_text_block_01.png",
+          "bbox": [
+            59,
+            968,
+            1849,
+            99
+          ],
+          "z": 7,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 9.12,
+          "duration": 0.7
+        }
+      ]
+    },
+    {
+      "index": 13,
+      "background": "output/slide_13/background.png",
+      "audio": "audio/slide_13_voiceover.mp3",
+      "start": 231.62,
+      "end": 241.82,
+      "duration": 10.2,
+      "narration": "執行 A 到 Z 診斷掃描：零語法錯誤、零邏輯缺口，編譯成功。你的系統已準備就緒，迎接審稿委員的挑戰。祝你投稿順利！",
+      "layers": [
+        {
+          "id": "s13-table-01",
+          "image": "output/slide_13/slide_13_table_01.png",
+          "bbox": [
+            231,
+            215,
+            1458,
+            441
+          ],
+          "z": 5,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 0.45,
+          "duration": 0.7
+        },
+        {
+          "id": "s13-illustration-01",
+          "image": "output/slide_13/slide_13_illustration_01.png",
+          "bbox": [
+            102,
+            716,
+            1726,
+            151
+          ],
+          "z": 6,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 3.12,
+          "duration": 0.7
+        },
+        {
+          "id": "s13-text-block-01",
+          "image": "output/slide_13/slide_13_text_block_01.png",
+          "bbox": [
+            686,
+            992,
+            539,
+            35
+          ],
+          "z": 7,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 5.78,
+          "duration": 0.7
+        }
+      ]
+    }
+  ]
+}

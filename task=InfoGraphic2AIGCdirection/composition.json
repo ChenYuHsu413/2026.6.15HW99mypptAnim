@@ -1,0 +1,1638 @@
+{
+  "canvas": {
+    "aspect": "16:9",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30
+  },
+  "transition": {
+    "type": "crossfade",
+    "duration": 0.5
+  },
+  "caption_style": {
+    "font": "Microsoft JhengHei",
+    "size": 11,
+    "primary_colour": "&H00FFFFFF",
+    "back_colour": "&H66000000",
+    "border_style": 3,
+    "outline": 8,
+    "shadow": 0,
+    "margins": [
+      30,
+      30,
+      10
+    ],
+    "letterbox_height": 960,
+    "band_color": "0x101010",
+    "chunk_max_chars": 32,
+    "tail_silence": 0.35
+  },
+  "slides": [
+    {
+      "index": 1,
+      "background": "output/slide_01/background.png",
+      "audio": "audio/slide_01_voiceover.mp3",
+      "start": 0.0,
+      "end": 16.8,
+      "duration": 16.8,
+      "narration": "我們正在從 narrow AI 走向 general AI，這從根本上改變了我們對工作的理解。這份 deck 會介紹兩條互補的路徑：vibe coding 和 workflow automation。兩者結合，指向一個人類引導系統、而不只是操作工具的未來。",
+      "layers": [
+        {
+          "id": "s01-title-main",
+          "image": "output/slide_01/slide_01_title_main.png",
+          "bbox": [
+            910,
+            79,
+            739,
+            140
+          ],
+          "z": 5,
+          "enter": {
+            "type": "fade-in-down",
+            "intensity": 1.0
+          },
+          "start": 0.45,
+          "duration": 0.7
+        },
+        {
+          "id": "s01-illustration-01",
+          "image": "output/slide_01/slide_01_illustration_01.png",
+          "bbox": [
+            315,
+            104,
+            601,
+            221
+          ],
+          "z": 7,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 4.0,
+          "duration": 0.7
+        },
+        {
+          "id": "s01-title-sub",
+          "image": "output/slide_01/slide_01_title_sub.png",
+          "bbox": [
+            910,
+            219,
+            739,
+            105
+          ],
+          "z": 6,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 2.0,
+          "duration": 0.7
+        },
+        {
+          "id": "s01-illustration-02",
+          "image": "output/slide_01/slide_01_illustration_02.png",
+          "bbox": [
+            298,
+            409,
+            478,
+            438
+          ],
+          "z": 8,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 6.0,
+          "duration": 0.7
+        },
+        {
+          "id": "s01-illustration-03",
+          "image": "output/slide_01/slide_01_illustration_03.png",
+          "bbox": [
+            711,
+            427,
+            546,
+            475
+          ],
+          "z": 9,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 8.0,
+          "duration": 0.7
+        },
+        {
+          "id": "s01-illustration-04",
+          "image": "output/slide_01/slide_01_illustration_04.png",
+          "bbox": [
+            1233,
+            401,
+            376,
+            444
+          ],
+          "z": 10,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 10.0,
+          "duration": 0.7
+        },
+        {
+          "id": "s01-illustration-05",
+          "image": "output/slide_01/slide_01_illustration_05.png",
+          "bbox": [
+            1553,
+            729,
+            314,
+            314
+          ],
+          "z": 11,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 12.0,
+          "duration": 0.7
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "background": "output/slide_02/background.png",
+      "audio": "audio/slide_02_voiceover.mp3",
+      "start": 17.3,
+      "end": 35.56,
+      "duration": 18.26,
+      "narration": "過去的模式是單一任務：你下指令、它執行、你再重複。現在的新模式是一個循環：understanding、decomposing、using tools、checking results，最後完成任務。這個轉變讓 AI 真正能被用在實際工作上，而不只是寫一些 isolated prompts。",
+      "layers": [
+        {
+          "id": "s02-title-01",
+          "image": "output/slide_02/slide_02_title_01.png",
+          "bbox": [
+            340,
+            60,
+            1237,
+            91
+          ],
+          "z": 5,
+          "enter": {
+            "type": "fade-in-down",
+            "intensity": 1.0
+          },
+          "start": 0.45,
+          "duration": 0.7
+        },
+        {
+          "id": "s02-illustration-01",
+          "image": "output/slide_02/slide_02_illustration_01.png",
+          "bbox": [
+            186,
+            266,
+            561,
+            519
+          ],
+          "z": 6,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 4.47,
+          "duration": 0.7
+        },
+        {
+          "id": "s02-illustration-02",
+          "image": "output/slide_02/slide_02_illustration_02.png",
+          "bbox": [
+            889,
+            162,
+            979,
+            683
+          ],
+          "z": 7,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 8.48,
+          "duration": 0.7
+        },
+        {
+          "id": "s02-key-point-card-01",
+          "image": "output/slide_02/slide_02_key_point_card_01.png",
+          "bbox": [
+            148,
+            845,
+            1623,
+            208
+          ],
+          "z": 8,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 12.5,
+          "duration": 0.7
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "background": "output/slide_03/background.png",
+      "audio": "audio/slide_03_voiceover.mp3",
+      "start": 36.06,
+      "end": 54.25,
+      "duration": 18.19,
+      "narration": "Vibe coding 的核心是用自然語言取代手動編碼和介面調整。你不用自己編輯每一個細節，而是描述你的意圖，讓 AI 把意圖轉換成執行。這讓操作者更像 creative director，而不是 hands-on mechanic。",
+      "layers": [
+        {
+          "id": "s03-title-01",
+          "image": "output/slide_03/slide_03_title_01.png",
+          "bbox": [
+            77,
+            72,
+            953,
+            101
+          ],
+          "z": 5,
+          "enter": {
+            "type": "fade-in-down",
+            "intensity": 1.0
+          },
+          "start": 0.45,
+          "duration": 0.7
+        },
+        {
+          "id": "s03-icon-01",
+          "image": "output/slide_03/slide_03_icon_01.png",
+          "bbox": [
+            1676,
+            44,
+            186,
+            198
+          ],
+          "z": 6,
+          "enter": {
+            "type": "pop-in",
+            "intensity": 1.0
+          },
+          "start": 1.9,
+          "duration": 0.7
+        },
+        {
+          "id": "s03-text-block-01",
+          "image": "output/slide_03/slide_03_text_block_01.png",
+          "bbox": [
+            91,
+            299,
+            662,
+            60
+          ],
+          "z": 7,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 3.36,
+          "duration": 0.7
+        },
+        {
+          "id": "s03-text-block-02",
+          "image": "output/slide_03/slide_03_text_block_02.png",
+          "bbox": [
+            1067,
+            299,
+            699,
+            60
+          ],
+          "z": 8,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 4.81,
+          "duration": 0.7
+        },
+        {
+          "id": "s03-illustration-01",
+          "image": "output/slide_03/slide_03_illustration_01.png",
+          "bbox": [
+            141,
+            408,
+            505,
+            311
+          ],
+          "z": 9,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 6.26,
+          "duration": 0.7
+        },
+        {
+          "id": "s03-illustration-02",
+          "image": "output/slide_03/slide_03_illustration_02.png",
+          "bbox": [
+            709,
+            489,
+            214,
+            130
+          ],
+          "z": 10,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 7.72,
+          "duration": 0.7
+        },
+        {
+          "id": "s03-illustration-03",
+          "image": "output/slide_03/slide_03_illustration_03.png",
+          "bbox": [
+            922,
+            376,
+            367,
+            321
+          ],
+          "z": 11,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 9.17,
+          "duration": 0.7
+        },
+        {
+          "id": "s03-illustration-04",
+          "image": "output/slide_03/slide_03_illustration_04.png",
+          "bbox": [
+            1256,
+            429,
+            243,
+            254
+          ],
+          "z": 12,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 10.63,
+          "duration": 0.7
+        },
+        {
+          "id": "s03-arrow-01",
+          "image": "output/slide_03/slide_03_arrow_01.png",
+          "bbox": [
+            1500,
+            501,
+            139,
+            104
+          ],
+          "z": 13,
+          "enter": {
+            "type": "wipe-in",
+            "intensity": 1.0
+          },
+          "start": 12.08,
+          "duration": 0.7
+        },
+        {
+          "id": "s03-illustration-05",
+          "image": "output/slide_03/slide_03_illustration_05.png",
+          "bbox": [
+            1657,
+            440,
+            183,
+            235
+          ],
+          "z": 14,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 13.53,
+          "duration": 0.7
+        },
+        {
+          "id": "s03-illustration-06",
+          "image": "output/slide_03/slide_03_illustration_06.png",
+          "bbox": [
+            59,
+            812,
+            1849,
+            255
+          ],
+          "z": 15,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 14.99,
+          "duration": 0.7
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "background": "output/slide_04/background.png",
+      "audio": "audio/slide_04_voiceover.mp3",
+      "start": 54.75,
+      "end": 72.1,
+      "duration": 17.35,
+      "narration": "左邊是傳統的操作者，被困在一個雜亂、固定的環境裡。右邊是 director，透過引導 design、programming、content 和 analysis 來塑造結果。關鍵改變不只是速度，而是對工作的一種全新掌控方式。",
+      "layers": [
+        {
+          "id": "s04-title-01",
+          "image": "output/slide_04/slide_04_title_01.png",
+          "bbox": [
+            164,
+            89,
+            1592,
+            75
+          ],
+          "z": 5,
+          "enter": {
+            "type": "fade-in-down",
+            "intensity": 1.0
+          },
+          "start": 0.45,
+          "duration": 0.7
+        },
+        {
+          "id": "s04-illustration-01",
+          "image": "output/slide_04/slide_04_illustration_01.png",
+          "bbox": [
+            797,
+            402,
+            352,
+            212
+          ],
+          "z": 6,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 2.61,
+          "duration": 0.7
+        },
+        {
+          "id": "s04-illustration-02",
+          "image": "output/slide_04/slide_04_illustration_02.png",
+          "bbox": [
+            1200,
+            255,
+            593,
+            461
+          ],
+          "z": 7,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 4.78,
+          "duration": 0.7
+        },
+        {
+          "id": "s04-illustration-03",
+          "image": "output/slide_04/slide_04_illustration_03.png",
+          "bbox": [
+            138,
+            251,
+            775,
+            755
+          ],
+          "z": 8,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 6.94,
+          "duration": 0.7
+        },
+        {
+          "id": "s04-text-block-01",
+          "image": "output/slide_04/slide_04_text_block_01.png",
+          "bbox": [
+            1264,
+            748,
+            71,
+            286
+          ],
+          "z": 9,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 9.11,
+          "duration": 0.7
+        },
+        {
+          "id": "s04-illustration-04",
+          "image": "output/slide_04/slide_04_illustration_04.png",
+          "bbox": [
+            1335,
+            783,
+            394,
+            227
+          ],
+          "z": 10,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 11.27,
+          "duration": 0.7
+        },
+        {
+          "id": "s04-text-block-02",
+          "image": "output/slide_04/slide_04_text_block_02.png",
+          "bbox": [
+            1704,
+            749,
+            73,
+            285
+          ],
+          "z": 11,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 13.44,
+          "duration": 0.7
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "background": "output/slide_05/background.png",
+      "audio": "audio/slide_05_voiceover.mp3",
+      "start": 72.6,
+      "end": 92.52,
+      "duration": 19.92,
+      "narration": "Workflow automation 的目標是用幾乎零人工干預的方式，一步步完成整個工作流程 — 從 input 到 output，不需要複製貼上或手動切換工具。這就是為什麼複雜、多階段的任務可以變得可重複、可規模化。",
+      "layers": [
+        {
+          "id": "s05-title-01",
+          "image": "output/slide_05/slide_05_title_01.png",
+          "bbox": [
+            88,
+            59,
+            1215,
+            75
+          ],
+          "z": 5,
+          "enter": {
+            "type": "fade-in-down",
+            "intensity": 1.0
+          },
+          "start": 0.45,
+          "duration": 0.7
+        },
+        {
+          "id": "s05-illustration-01",
+          "image": "output/slide_05/slide_05_illustration_01.png",
+          "bbox": [
+            1617,
+            41,
+            278,
+            286
+          ],
+          "z": 6,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 2.22,
+          "duration": 0.7
+        },
+        {
+          "id": "s05-chart-01",
+          "image": "output/slide_05/slide_05_chart_01.png",
+          "bbox": [
+            390,
+            207,
+            1120,
+            359
+          ],
+          "z": 7,
+          "enter": {
+            "type": "draw-in",
+            "intensity": 1.0
+          },
+          "start": 3.99,
+          "duration": 0.7
+        },
+        {
+          "id": "s05-illustration-02",
+          "image": "output/slide_05/slide_05_illustration_02.png",
+          "bbox": [
+            802,
+            471,
+            217,
+            240
+          ],
+          "z": 8,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 5.77,
+          "duration": 0.7
+        },
+        {
+          "id": "s05-key-point-card-01",
+          "image": "output/slide_05/slide_05_key_point_card_01.png",
+          "bbox": [
+            152,
+            722,
+            311,
+            196
+          ],
+          "z": 9,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 7.54,
+          "duration": 0.7
+        },
+        {
+          "id": "s05-illustration-03",
+          "image": "output/slide_05/slide_05_illustration_03.png",
+          "bbox": [
+            463,
+            717,
+            243,
+            215
+          ],
+          "z": 10,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 9.31,
+          "duration": 0.7
+        },
+        {
+          "id": "s05-key-point-card-02",
+          "image": "output/slide_05/slide_05_key_point_card_02.png",
+          "bbox": [
+            706,
+            719,
+            325,
+            199
+          ],
+          "z": 11,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 11.08,
+          "duration": 0.7
+        },
+        {
+          "id": "s05-illustration-04",
+          "image": "output/slide_05/slide_05_illustration_04.png",
+          "bbox": [
+            1031,
+            718,
+            518,
+            214
+          ],
+          "z": 12,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 12.85,
+          "duration": 0.7
+        },
+        {
+          "id": "s05-key-point-card-03",
+          "image": "output/slide_05/slide_05_key_point_card_03.png",
+          "bbox": [
+            1549,
+            720,
+            219,
+            198
+          ],
+          "z": 13,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 14.63,
+          "duration": 0.7
+        },
+        {
+          "id": "s05-text-block-01",
+          "image": "output/slide_05/slide_05_text_block_01.png",
+          "bbox": [
+            58,
+            976,
+            1515,
+            67
+          ],
+          "z": 14,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 16.4,
+          "duration": 0.7
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "background": "output/slide_06/background.png",
+      "audio": "audio/slide_06_voiceover.mp3",
+      "start": 93.02,
+      "end": 114.14,
+      "duration": 21.12,
+      "narration": "這張 slide 展示了一條完整的 production pipeline：從 PDF 開始，經過 summary、script、storyboard、microphone、subtitle，到 final review。重點是，AI 現在可以協調 end-to-end 的流程，而不只是生成單一答案。它可以用來製作完整的教學影片，省去大量手動串接的工作。",
+      "layers": [
+        {
+          "id": "s06-title-01",
+          "image": "output/slide_06/slide_06_title_01.png",
+          "bbox": [
+            497,
+            69,
+            934,
+            149
+          ],
+          "z": 5,
+          "enter": {
+            "type": "fade-in-down",
+            "intensity": 1.0
+          },
+          "start": 0.45,
+          "duration": 0.7
+        },
+        {
+          "id": "s06-arrow-01",
+          "image": "output/slide_06/slide_06_arrow_01.png",
+          "bbox": [
+            157,
+            393,
+            72,
+            36
+          ],
+          "z": 6,
+          "enter": {
+            "type": "wipe-in",
+            "intensity": 1.0
+          },
+          "start": 1.71,
+          "duration": 0.7
+        },
+        {
+          "id": "s06-arrow-02",
+          "image": "output/slide_06/slide_06_arrow_02.png",
+          "bbox": [
+            374,
+            352,
+            149,
+            46
+          ],
+          "z": 7,
+          "enter": {
+            "type": "wipe-in",
+            "intensity": 1.0
+          },
+          "start": 2.97,
+          "duration": 0.7
+        },
+        {
+          "id": "s06-arrow-03",
+          "image": "output/slide_06/slide_06_arrow_03.png",
+          "bbox": [
+            871,
+            351,
+            177,
+            78
+          ],
+          "z": 8,
+          "enter": {
+            "type": "wipe-in",
+            "intensity": 1.0
+          },
+          "start": 4.23,
+          "duration": 0.7
+        },
+        {
+          "id": "s06-icon-01",
+          "image": "output/slide_06/slide_06_icon_01.png",
+          "bbox": [
+            1652,
+            244,
+            147,
+            185
+          ],
+          "z": 9,
+          "enter": {
+            "type": "pop-in",
+            "intensity": 1.0
+          },
+          "start": 5.5,
+          "duration": 0.7
+        },
+        {
+          "id": "s06-illustration-01",
+          "image": "output/slide_06/slide_06_illustration_01.png",
+          "bbox": [
+            100,
+            448,
+            254,
+            183
+          ],
+          "z": 10,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 6.76,
+          "duration": 0.7
+        },
+        {
+          "id": "s06-illustration-02",
+          "image": "output/slide_06/slide_06_illustration_02.png",
+          "bbox": [
+            356,
+            393,
+            439,
+            238
+          ],
+          "z": 11,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 8.02,
+          "duration": 0.7
+        },
+        {
+          "id": "s06-illustration-03",
+          "image": "output/slide_06/slide_06_illustration_03.png",
+          "bbox": [
+            796,
+            448,
+            325,
+            183
+          ],
+          "z": 12,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 9.28,
+          "duration": 0.7
+        },
+        {
+          "id": "s06-illustration-04",
+          "image": "output/slide_06/slide_06_illustration_04.png",
+          "bbox": [
+            1122,
+            393,
+            255,
+            239
+          ],
+          "z": 13,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 10.54,
+          "duration": 0.7
+        },
+        {
+          "id": "s06-illustration-05",
+          "image": "output/slide_06/slide_06_illustration_05.png",
+          "bbox": [
+            1378,
+            393,
+            255,
+            238
+          ],
+          "z": 14,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 11.8,
+          "duration": 0.7
+        },
+        {
+          "id": "s06-icon-02",
+          "image": "output/slide_06/slide_06_icon_02.png",
+          "bbox": [
+            1634,
+            448,
+            183,
+            184
+          ],
+          "z": 15,
+          "enter": {
+            "type": "pop-in",
+            "intensity": 1.0
+          },
+          "start": 13.06,
+          "duration": 0.7
+        },
+        {
+          "id": "s06-arrow-04",
+          "image": "output/slide_06/slide_06_arrow_04.png",
+          "bbox": [
+            354,
+            649,
+            34,
+            50
+          ],
+          "z": 16,
+          "enter": {
+            "type": "wipe-in",
+            "intensity": 1.0
+          },
+          "start": 14.32,
+          "duration": 0.7
+        },
+        {
+          "id": "s06-illustration-06",
+          "image": "output/slide_06/slide_06_illustration_06.png",
+          "bbox": [
+            395,
+            688,
+            1118,
+            105
+          ],
+          "z": 17,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 15.59,
+          "duration": 0.7
+        },
+        {
+          "id": "s06-arrow-05",
+          "image": "output/slide_06/slide_06_arrow_05.png",
+          "bbox": [
+            1520,
+            648,
+            43,
+            54
+          ],
+          "z": 18,
+          "enter": {
+            "type": "wipe-in",
+            "intensity": 1.0
+          },
+          "start": 16.85,
+          "duration": 0.7
+        },
+        {
+          "id": "s06-illustration-07",
+          "image": "output/slide_06/slide_06_illustration_07.png",
+          "bbox": [
+            64,
+            814,
+            383,
+            229
+          ],
+          "z": 19,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 18.11,
+          "duration": 0.7
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "background": "output/slide_07/background.png",
+      "audio": "audio/slide_07_voiceover.mp3",
+      "start": 114.64,
+      "end": 132.11,
+      "duration": 17.47,
+      "narration": "這兩條路徑回答的是不同的問題。Vibe coding 問的是「我怎麼用這個工具？」；workflow automation 問的是「整個工作要怎麼被完成？」。一條把人類從 operator 變成 director，另一條從 user 變成 flow designer。",
+      "layers": [
+        {
+          "id": "s07-title-01",
+          "image": "output/slide_07/slide_07_title_01.png",
+          "bbox": [
+            424,
+            67,
+            1070,
+            68
+          ],
+          "z": 5,
+          "enter": {
+            "type": "fade-in-down",
+            "intensity": 1.0
+          },
+          "start": 0.45,
+          "duration": 0.7
+        },
+        {
+          "id": "s07-text-block-01",
+          "image": "output/slide_07/slide_07_text_block_01.png",
+          "bbox": [
+            1077,
+            215,
+            701,
+            96
+          ],
+          "z": 6,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 2.63,
+          "duration": 0.7
+        },
+        {
+          "id": "s07-table-01",
+          "image": "output/slide_07/slide_07_table_01.png",
+          "bbox": [
+            124,
+            220,
+            970,
+            536
+          ],
+          "z": 7,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 4.81,
+          "duration": 0.7
+        },
+        {
+          "id": "s07-illustration-01",
+          "image": "output/slide_07/slide_07_illustration_01.png",
+          "bbox": [
+            1175,
+            363,
+            495,
+            137
+          ],
+          "z": 8,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 6.99,
+          "duration": 0.7
+        },
+        {
+          "id": "s07-illustration-02",
+          "image": "output/slide_07/slide_07_illustration_02.png",
+          "bbox": [
+            1130,
+            587,
+            653,
+            117
+          ],
+          "z": 9,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 9.18,
+          "duration": 0.7
+        },
+        {
+          "id": "s07-illustration-03",
+          "image": "output/slide_07/slide_07_illustration_03.png",
+          "bbox": [
+            130,
+            756,
+            774,
+            201
+          ],
+          "z": 10,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 11.36,
+          "duration": 0.7
+        },
+        {
+          "id": "s07-illustration-04",
+          "image": "output/slide_07/slide_07_illustration_04.png",
+          "bbox": [
+            1094,
+            736,
+            684,
+            220
+          ],
+          "z": 11,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 13.54,
+          "duration": 0.7
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "background": "output/slide_08/background.png",
+      "audio": "audio/slide_08_voiceover.mp3",
+      "start": 132.61,
+      "end": 149.89,
+      "duration": 17.28,
+      "narration": "真正的未來不是在兩者之間選擇，而是把它們結合起來。Vibe coding 處理單一步驟的執行，workflow automation 把步驟串成完整的序列。兩者加在一起，就形成了一個真正的 AI system，能夠執行、協調、並且持續改善。",
+      "layers": [
+        {
+          "id": "s08-title-01",
+          "image": "output/slide_08/slide_08_title_01.png",
+          "bbox": [
+            232,
+            83,
+            1453,
+            104
+          ],
+          "z": 5,
+          "enter": {
+            "type": "fade-in-down",
+            "intensity": 1.0
+          },
+          "start": 0.45,
+          "duration": 0.7
+        },
+        {
+          "id": "s08-illustration-01",
+          "image": "output/slide_08/slide_08_illustration_01.png",
+          "bbox": [
+            59,
+            300,
+            463,
+            461
+          ],
+          "z": 6,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 2.6,
+          "duration": 0.7
+        },
+        {
+          "id": "s08-illustration-02",
+          "image": "output/slide_08/slide_08_illustration_02.png",
+          "bbox": [
+            551,
+            456,
+            762,
+            205
+          ],
+          "z": 7,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 4.76,
+          "duration": 0.7
+        },
+        {
+          "id": "s08-illustration-03",
+          "image": "output/slide_08/slide_08_illustration_03.png",
+          "bbox": [
+            1315,
+            230,
+            593,
+            608
+          ],
+          "z": 8,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 6.91,
+          "duration": 0.7
+        },
+        {
+          "id": "s08-illustration-04",
+          "image": "output/slide_08/slide_08_illustration_04.png",
+          "bbox": [
+            110,
+            802,
+            373,
+            186
+          ],
+          "z": 9,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 9.07,
+          "duration": 0.7
+        },
+        {
+          "id": "s08-illustration-05",
+          "image": "output/slide_08/slide_08_illustration_05.png",
+          "bbox": [
+            699,
+            802,
+            491,
+            186
+          ],
+          "z": 10,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 11.22,
+          "duration": 0.7
+        },
+        {
+          "id": "s08-illustration-06",
+          "image": "output/slide_08/slide_08_illustration_06.png",
+          "bbox": [
+            1409,
+            846,
+            414,
+            134
+          ],
+          "z": 11,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 13.38,
+          "duration": 0.7
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "background": "output/slide_09/background.png",
+      "audio": "audio/slide_09_voiceover.mp3",
+      "start": 150.39,
+      "end": 172.37,
+      "duration": 21.98,
+      "narration": "要建立這樣的系統，需要一張清晰的 blueprint：先找到真實場景、分析現有流程、找出 AI 機會、設計 interaction 和 workflow、接著 build prototype、test and iterate，最後 present and reflect。每一步都讓系統變得更真實、更可用。這就是從 AI user 成長為 AI workflow designer 的路徑。",
+      "layers": [
+        {
+          "id": "s09-title-01",
+          "image": "output/slide_09/slide_09_title_01.png",
+          "bbox": [
+            337,
+            43,
+            1261,
+            99
+          ],
+          "z": 5,
+          "enter": {
+            "type": "fade-in-down",
+            "intensity": 1.0
+          },
+          "start": 0.45,
+          "duration": 0.7
+        },
+        {
+          "id": "s09-key-point-card-01",
+          "image": "output/slide_09/slide_09_key_point_card_01.png",
+          "bbox": [
+            101,
+            179,
+            375,
+            184
+          ],
+          "z": 6,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 2.25,
+          "duration": 0.7
+        },
+        {
+          "id": "s09-key-point-card-02",
+          "image": "output/slide_09/slide_09_key_point_card_02.png",
+          "bbox": [
+            644,
+            179,
+            375,
+            175
+          ],
+          "z": 7,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 4.05,
+          "duration": 0.7
+        },
+        {
+          "id": "s09-key-point-card-03",
+          "image": "output/slide_09/slide_09_key_point_card_03.png",
+          "bbox": [
+            473,
+            179,
+            1191,
+            295
+          ],
+          "z": 8,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 5.84,
+          "duration": 0.7
+        },
+        {
+          "id": "s09-key-point-card-04",
+          "image": "output/slide_09/slide_09_key_point_card_04.png",
+          "bbox": [
+            455,
+            478,
+            372,
+            194
+          ],
+          "z": 9,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 7.64,
+          "duration": 0.7
+        },
+        {
+          "id": "s09-key-point-card-05",
+          "image": "output/slide_09/slide_09_key_point_card_05.png",
+          "bbox": [
+            1000,
+            507,
+            372,
+            195
+          ],
+          "z": 10,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 9.44,
+          "duration": 0.7
+        },
+        {
+          "id": "s09-illustration-01",
+          "image": "output/slide_09/slide_09_illustration_01.png",
+          "bbox": [
+            1465,
+            496,
+            397,
+            223
+          ],
+          "z": 11,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 11.24,
+          "duration": 0.7
+        },
+        {
+          "id": "s09-key-point-card-06",
+          "image": "output/slide_09/slide_09_key_point_card_06.png",
+          "bbox": [
+            446,
+            830,
+            276,
+            192
+          ],
+          "z": 12,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 13.04,
+          "duration": 0.7
+        },
+        {
+          "id": "s09-table-01",
+          "image": "output/slide_09/slide_09_table_01.png",
+          "bbox": [
+            91,
+            474,
+            1306,
+            559
+          ],
+          "z": 13,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 14.84,
+          "duration": 0.7
+        },
+        {
+          "id": "s09-key-point-card-07",
+          "image": "output/slide_09/slide_09_key_point_card_07.png",
+          "bbox": [
+            1397,
+            830,
+            293,
+            202
+          ],
+          "z": 14,
+          "enter": {
+            "type": "fade-in-up",
+            "intensity": 1.0
+          },
+          "start": 16.63,
+          "duration": 0.7
+        },
+        {
+          "id": "s09-icon-01",
+          "image": "output/slide_09/slide_09_icon_01.png",
+          "bbox": [
+            1690,
+            857,
+            176,
+            165
+          ],
+          "z": 15,
+          "enter": {
+            "type": "pop-in",
+            "intensity": 1.0
+          },
+          "start": 18.43,
+          "duration": 0.7
+        }
+      ]
+    },
+    {
+      "index": 10,
+      "background": "output/slide_10/background.png",
+      "audio": "audio/slide_10_voiceover.mp3",
+      "start": 172.87,
+      "end": 192.45,
+      "duration": 19.58,
+      "narration": "下一世代的工作需要新的核心技能：professional expression、prompt design、task deconstruction、workflow design，還有 quality control。這些能力讓人們能夠清晰且自信地引導 AI。目標不再只是把 AI 用得好，而是設計出好的工作系統。",
+      "layers": [
+        {
+          "id": "s10-title-01",
+          "image": "output/slide_10/slide_10_title_01.png",
+          "bbox": [
+            276,
+            59,
+            1369,
+            106
+          ],
+          "z": 5,
+          "enter": {
+            "type": "fade-in-down",
+            "intensity": 1.0
+          },
+          "start": 0.45,
+          "duration": 0.7
+        },
+        {
+          "id": "s10-illustration-01",
+          "image": "output/slide_10/slide_10_illustration_01.png",
+          "bbox": [
+            254,
+            221,
+            246,
+            182
+          ],
+          "z": 6,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 2.38,
+          "duration": 0.7
+        },
+        {
+          "id": "s10-icon-01",
+          "image": "output/slide_10/slide_10_icon_01.png",
+          "bbox": [
+            507,
+            211,
+            150,
+            174
+          ],
+          "z": 7,
+          "enter": {
+            "type": "pop-in",
+            "intensity": 1.0
+          },
+          "start": 4.31,
+          "duration": 0.7
+        },
+        {
+          "id": "s10-illustration-02",
+          "image": "output/slide_10/slide_10_illustration_02.png",
+          "bbox": [
+            1093,
+            207,
+            670,
+            174
+          ],
+          "z": 8,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 6.24,
+          "duration": 0.7
+        },
+        {
+          "id": "s10-illustration-03",
+          "image": "output/slide_10/slide_10_illustration_03.png",
+          "bbox": [
+            673,
+            245,
+            409,
+            368
+          ],
+          "z": 9,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 8.17,
+          "duration": 0.7
+        },
+        {
+          "id": "s10-illustration-04",
+          "image": "output/slide_10/slide_10_illustration_04.png",
+          "bbox": [
+            209,
+            506,
+            576,
+            160
+          ],
+          "z": 10,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 10.11,
+          "duration": 0.7
+        },
+        {
+          "id": "s10-illustration-05",
+          "image": "output/slide_10/slide_10_illustration_05.png",
+          "bbox": [
+            1127,
+            500,
+            599,
+            166
+          ],
+          "z": 11,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 12.04,
+          "duration": 0.7
+        },
+        {
+          "id": "s10-illustration-06",
+          "image": "output/slide_10/slide_10_illustration_06.png",
+          "bbox": [
+            739,
+            602,
+            456,
+            231
+          ],
+          "z": 12,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 13.97,
+          "duration": 0.7
+        },
+        {
+          "id": "s10-illustration-07",
+          "image": "output/slide_10/slide_10_illustration_07.png",
+          "bbox": [
+            108,
+            850,
+            1741,
+            195
+          ],
+          "z": 13,
+          "enter": {
+            "type": "zoom-in",
+            "intensity": 1.0
+          },
+          "start": 15.9,
+          "duration": 0.7
+        }
+      ]
+    }
+  ]
+}

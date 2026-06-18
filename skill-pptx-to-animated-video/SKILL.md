@@ -75,6 +75,11 @@ the layer a UI writes per task.
 6. **Timeline**: `build_timeline.py` → `narration_timing.json`, SRT/VTT,
    `hyperframes/` browser preview. Preview: `python -m http.server 8080` →
    `http://localhost:8080/hyperframes/index.html`.
+   Then `build_composition.py` → `composition.json`, the renderer-neutral
+   "resolved" contract (canvas + caption style + per-slide layers with
+   semantic `enter` animations and stable layer ids). It is read-only w.r.t.
+   all other artifacts; `validate_composition.py` checks it faithfully matches
+   metadata + timing. This is the single document renderers/adapters consume.
 7. **Render — only after the user approves the cuts** (it's the expensive
    step): `render_final_video.py` → `final/final_video_with_voiceover.mp4` +
    burned-subtitles version. Run it in the background; it prints one line per
