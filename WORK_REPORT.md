@@ -159,3 +159,57 @@ User 一開始就強調：「I want to develop a skill, not just only for these 
 - TTS 多語：目前 zh-TW 預設，英語 deck 要替換 voice + 詞距、字距規則。
 - 黑色 letterbox 顏色：`0x101010` 與字幕 box 顏色接近一致，若 slide 主視覺也是深色可能融在一起；可改 deck-specific 背景色。
 - collage 偵測：`ink_ratio ≥ 0.17` 閾值僅在 writing-os deck 校準，未來其他 deck 仍需 layer gallery review。
+
+---
+
+## 7. Session 4 — 架構重整：合約層 + overrides + 可視化編輯（2026-06-18）
+
+User 想把這套東西長成一個「上傳 → 切圖 → UI 檢查/調整 → 生成影片」的系統，所以這個 session 的重點
+不是切圖，而是**把資料流重整成可編輯、可替換、互不汙染的架構**。全程每一步都用「無 override 時輸出
+byte 不變」當回歸測試（git diff 空），沒有重新 render（環境無 ffprobe/網路，render/TTS 在 user 機器上跑）。
+
+### 7.0 先釐清的兩個誤會
+- **切圖 ≠ HyperFrames**：切圖一直是自製 `segment_elements.py`（OpenCV）；HyperFrames 是渲染框架，
+  本專案根本沒接它，最終影片是自製 numpy+ffmpeg 渲染器。
+- **「只讀 PDF」不是退化**：來源是圖片型 PPTX（無可編輯元件），native PPTX 解析從未被實作，PDF 只是
+  最乾淨的「投影片→圖片」中繼。
+
+### 7.1 兩個架構決策（寫進 ANALYSIS_REPORT 第 10、11 節）
+1. **渲染路線**：先用自製渲染器（已驗證），但把「渲染段」設計成讀一份**渲染器中立的合約**，替未來接
+   HyperFrames 留門。draft 預覽也走同一份合約。
+2. **PPTX 範圍**：範圍 2 —— UI 接受 .pptx、後端自動轉 PDF，引擎不變（原生 PPTX 快速路徑列為未來分支）。
+
+### 7.2 實作（依序，每步 commit + push）
+| 步驟 | 內容 | 驗證 |
+|---|---|---|
+| config 三檔 | 把寫死的 canvas/voice/caption 抽成 `config/*.json` + `config.py`（skill 預設 ⊕ task 覆蓋） | build_timeline 重生 git diff 空；ffmpeg 字幕字串逐字相同 |
+| composition 合約 | `build_composition.py` → `composition.json`（canvas + caption_style + 每層穩定 id + 語意 enter）；`validate_composition.py` 驗證 | 4 task generate+validate 全 faithful（216 layers） |
+| overrides 層 | `overrides.json`（keyed by slide）；`build_composition` 套用；**pipeline_server 停止覆寫 metadata/narration_script** | override 進 composition、metadata pristine；server /apply 不動生成檔 |
+| overrides→TTS/timeline | `tts_edge`/`build_timeline` 改讀 effective 旁白；`media.py` 對「編輯過的頁」從當前音檔重量 duration（解耦切圖） | 無 override 時輸出 byte 不變；旁白 override 進字幕/timeline/composition |
+| render adapter | `render_final_video.py` 改讀 `composition.json` | 結構等價：render 吃到的資料與舊路徑逐欄位相同 |
+| draft 預覽 adapter | `hyperframes/animation.js` 改讀 `composition.json`（與成片同源，消除漂移） | node --check 過；composition 欄位齊全 |
+| 共用 pipeline-ui | repo 根目錄 composition-driven 三欄 inspector，瀏覽全部 task；`pipeline_server.py`（多 task、防穿越、port 9001） | server GET/POST 全 200；/apply 寫 overrides、生成檔 pristine |
+| 直接編輯控制項 | UI 內可編旁白/語音/layer(start/duration/animation)，寫結構化 overrides，套用後自動重載（所見即所得）；notes 保留當補充 | layer 編輯進 composition、metadata pristine；UTF-8 旁白編輯進 timeline/composition |
+
+### 7.3 踩到的環境坑
+- **WinError 10013 / port 8000-8099 被保留**：學校還原卡電腦擋掉這段 port 的 socket bind。改用
+  9001/9000/3000/5000/5500/9090。README 與 server 預設都改成 9001。
+- **ffprobe / edge-tts 不在這台**：duration refresh 與 TTS 走優雅降級（fallback baked / 記錄錯誤不致命），
+  邏輯已驗證，實際音檔/時長更新需在 user 有網路+ffprobe 的機器跑。
+
+### 7.4 成果
+資料流變成乾淨三層、兩端同源：
+```
+generated（metadata/narration_script，唯讀）
+   └─ overrides.json（編輯只動這裡）
+        └─ composition.json（resolved 合約）──┬─ render_final_video → MP4
+                                              └─ hyperframes draft 預覽 / pipeline-ui
+```
+ANALYSIS_REPORT 的 P0 全完成、P1 部分完成；新增可視化編輯 UI。詳細打勾見 ANALYSIS_REPORT 第 7、8 節。
+
+### 7.5 後續
+- per-layer `start` 真正移到 timeline 重算（目前 baked + clamp）。
+- OCR + confidence（解鎖切圖修正 UI 與真 AI storyboard）。
+- UI 切圖修正（合併/拆分/bbox）。
+- PPTX 自動轉 PDF 的實作（範圍 2 目前只到決策）。
+- 收斂各 task 內漂移的 `scripts/` 副本到單一 skill。

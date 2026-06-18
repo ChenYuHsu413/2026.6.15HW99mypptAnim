@@ -17,24 +17,36 @@
 | `task=HW6-Startup50-Summary/` | 50_Startups_Feature_Selection.pdf | 20 | session 1 完成，完整 pipeline 已歸位 |
 | `task=writing-os/` | The A-Z Writing OS.pdf | 13 | session 2-3 完成，最新影片在 `task=writing-os/final/` |
 | `task=A2Z-animation/` | A2Z.pdf | 13 | 已整理完成，完整 pipeline 已歸位 |
+| `task=InfoGraphic2AIGCdirection/` | The_AI_Workflow_Evolution.pdf | 10 | 完成，最早的 pipeline-ui 來源 |
 
 每個 task folder 都是自包含的；共用邏輯都在 skill 裡。
+
+> **session 4（2026-06-18）大改架構**：引入 `composition.json`「resolved 合約」+ `overrides.json`
+> 編輯層 + config 三檔，並把渲染器與瀏覽器預覽都改讀同一份合約。新增 repo 根目錄的共用
+> **pipeline-ui** 可視化編輯介面。詳見下方〈設定與編輯〉與 [`ANALYSIS_REPORT.md`](ANALYSIS_REPORT.md)。
 
 ## Pipeline
 
 ```
-task=HW6-Startup50-Summary/sources/*.pdf ──> task=HW6-Startup50-Summary/output/slide_##/original.png
-                        (PDF 轉 1920x1080 PNG)
-                        │
-                        ▼  scripts/segment_elements.py
-        task=HW6-Startup50-Summary/output/slide_##/  透明 element layers + background.png + metadata.json
-                        │
-                        ▼  scripts/build_timeline.py
-        task=HW6-Startup50-Summary/narration/narration_timing.json + subtitles + hyperframes/project.json
-                        │
-                        ▼  scripts/render_final_video.py
-        task=HW6-Startup50-Summary/final/final_video_with_voiceover(.../_and_subtitles).mp4
+deck.pdf ──> output/slide_##/original.png              (render_slides.py：PDF→1920x1080 PNG)
+        │
+        ▼  segment_elements.py
+   output/slide_##/  透明 element layers + background.png + metadata.json   ← generated（唯讀）
+        │
+        ▼  build_timeline.py        （讀 metadata + narration_script + overrides）
+   narration/narration_timing.json + subtitles.srt/.vtt + hyperframes/ 預覽
+        │
+        ▼  build_composition.py      （merge：config + metadata + timing + overrides.json）
+   composition.json                              ← resolved「合約」：渲染器中立的單一真相
+        │                                          （validate_composition.py 驗證忠實）
+        ├────────────────▼  render_final_video.py
+        │           final/final_video_with_voiceover(.../_and_subtitles).mp4
+        └────────────────▼  hyperframes/animation.js（瀏覽器 draft 預覽，讀同一份 composition.json）
 ```
+
+**三層分離**：`generated`（metadata/narration_script，唯讀）→ `overrides.json`（使用者/AI 編輯，
+只存差異）→ `composition.json`（resolved，render 前才 merge）。編輯只動 `overrides.json`，
+生成來源永遠不被汙染；成片與預覽都消費同一份 `composition.json`，所以不會漂移。
 
 旁白時間軸為主、反向安排動畫出現時間（layer 的進場時間排在該頁旁白窗口內）。
 
@@ -42,19 +54,26 @@ task=HW6-Startup50-Summary/sources/*.pdf ──> task=HW6-Startup50-Summary/outp
 
 ```powershell
 cd task=HW6-Startup50-Summary
+$SK = "../skill-pptx-to-animated-video/scripts"
 
-# 1. 重生 TTS（可換語速：-8% 教學語速、+38% ≈ 1.5× 快）
-python "../skill-pptx-to-animated-video/scripts/tts_edge.py" zh-TW-HsiaoChenNeural +38%
+# 1. 重生 TTS（語速可在 voice_config.json 設，或用 CLI 參數覆蓋：-8% 教學、+38% ≈ 1.5× 快）
+python "$SK/tts_edge.py" zh-TW-HsiaoChenNeural +38%
 
-# 2. 重切全部頁面（或指定頁碼如：python scripts/segment_elements.py 2 4）
-python scripts/segment_elements.py
+# 2. 重切全部頁面（或指定頁碼如：python "$SK/segment_elements.py" 2 4）
+python "$SK/segment_elements.py"
 
-# 3. 依新 metadata 重建旁白時間軸 + 字幕 + HyperFrames 專案
-python scripts/build_timeline.py
+# 3. 依新 metadata 重建旁白時間軸 + 字幕 + 瀏覽器預覽
+python "$SK/build_timeline.py"
 
-# 4. 渲染最終影片（無字幕版 + 燒錄字幕版，背景跑）
-python scripts/render_final_video.py
+# 4. 產生 resolved 合約 composition.json（套用 overrides.json，若有）
+python "$SK/build_composition.py"
+
+# 5. 渲染最終影片（讀 composition.json；無字幕版 + 燒錄字幕版，背景跑）
+python "$SK/render_final_video.py"
 ```
+
+> 只改 `overrides.json`（旁白/語音/layer 時間）時：旁白或語音改了 → 重跑步驟 1、3、4、5；
+> 只改 layer 時間/動畫 → 只需步驟 4、5。用 pipeline-ui 編輯時這些會由 server 自動串起來。
 
 只改字幕樣式時，不需要重 render，直接重燒字幕即可：
 ```powershell
@@ -111,15 +130,55 @@ python scripts/render_final_video.py
 半透明黑底 + 白字、ASS BorderStyle=3 + BackColour=&H66000000。
 `+38%` 配 32-char chunk 通常一行一句，順暢易讀。
 
-## 瀏覽器預覽（HyperFrames）
+## 設定與編輯（config / overrides / pipeline-ui）
+
+### 全片設定（三個 config 檔）
+寫死的 canvas / 語音 / 字幕設定已抽到 skill 的 `config/`（由 `scripts/config.py` 載入）：
+- `project_config.json` — `canvas`(aspect/width/height/fps) + `render`(crf/preset/transition/sample_rate)
+- `voice_config.json` — TTS `voice`/`rate`
+- `caption_config.json` — 字幕分塊 + 燒錄 ASS 樣式 + letterbox
+
+這些是預設值；想客製某個 deck，在該 task 根目錄放同名 JSON 即可（deep-merge 覆蓋，只寫要改的鍵）。
+
+### 編輯層（`overrides.json`）
+使用者/AI 的編輯都寫進 task 根目錄的 `overrides.json`（不動生成檔），keyed by slide：
+```json
+{
+  "voice": { "voice": "zh-TW-YunJheNeural", "rate": "-10%" },
+  "slide_03": {
+    "narration": "改過的旁白文字",
+    "notes": "給 agent 的備註",
+    "layers": { "slide_03_chart_01.png": { "start": 1.2, "animation": "zoom-in" } }
+  }
+}
+```
+`build_composition.py` 會把它疊在 pristine metadata 上產生 `composition.json`。旁白/語音改了會連帶
+重跑 TTS + timeline（音檔/字幕跟著更新）；只改 layer 時間/動畫則只重建 composition（快）。
+
+### 可視化編輯介面（pipeline-ui）
+repo 根目錄有共用版 **pipeline-ui**，可瀏覽並編輯所有 task（讀 `task-index.json` + 各 task 的
+`composition.json`）。要編輯需開 server：
+```powershell
+# 在 repo 根目錄
+python pipeline_server.py 9001          # 預設 9001（8000-8099 在部分 Windows 機被保留擋掉）
+```
+開 <http://localhost:9001/pipeline-ui/>：
+- 左：slide 列表　中：Composite 預覽（▶ Play 逐層動畫 + 同步字幕 + 語音）、資產分頁
+  （Original/Background/Debug/Gallery）、layer timing 軸　右：slide 數據、可編輯旁白 + 語音播放、layer 列表
+- **編輯**：點 layer → 改 start/duration/animation → Apply（即時更新）；改旁白 → Save narration（重跑 TTS）；
+  語音/語速 → Apply voice。全部寫進 `overrides.json`，套用後自動重載 composition（所見即所得）。
+- **MP4 export** 按鈕可直接從 UI 觸發 render。
+- 純檢視不需 server：`python -m http.server 9001` 後一樣能開（只是編輯/render 鈕無效）。
+
+## 瀏覽器預覽（單 task draft）
 
 ```powershell
 cd task=HW6-Startup50-Summary
-python -m http.server 8080
+python -m http.server 9001     # 注意：8080 在部分機器被擋，用 9001/3000/5000/9000
 ```
 
-開 <http://localhost:8080/hyperframes/index.html> 按 Play：
-背景＋透明 layers 按 `project.json` 的時間軸逐個進場，同步播放各頁旁白 MP3。
+開 <http://localhost:9001/hyperframes/index.html> 按 Play：背景＋透明 layers 按 **`composition.json`**
+的時間軸逐個進場（與成片同源），同步播放各頁旁白 MP3。
 
 ## 輸出清單（task=HW6-Startup50-Summary/）
 
@@ -135,14 +194,27 @@ python -m http.server 8080
 ## Skill 結構
 
 ```
-.claude/skills/skill-pptx-to-animated-video/
-├── SKILL.md          # workflow、segmentation 品質規則、字幕規範
+skill-pptx-to-animated-video/
+├── SKILL.md                # workflow、segmentation 品質規則、字幕規範、config/overrides 說明
+├── config/                 # 全片預設（可被 task 根目錄同名檔覆蓋）
+│   ├── project_config.json     # canvas + render
+│   ├── voice_config.json       # TTS voice/rate
+│   └── caption_config.json     # 字幕分塊 + ASS 樣式 + letterbox
 └── scripts/
-    ├── render_slides.py        # PDF → PNG
-    ├── tts_edge.py             # Edge TTS（可指定語速）
-    ├── segment_elements.py     # 切圖（含 collage_cluster、panel-card、trim fraction）
-    ├── build_timeline.py       # 字幕分塊、HyperFrames、SRT/VTT
-    └── render_final_video.py   # 字幕 letterbox 燒錄
+    ├── config.py              # 載入三個 config（skill 預設 ⊕ task 覆蓋）
+    ├── overrides.py           # overrides.json 載入 + 套用 helper + 穩定 id
+    ├── media.py               # 從當前音檔重新量測 duration（解耦 TTS↔切圖）
+    ├── render_slides.py       # PDF → PNG
+    ├── tts_edge.py            # Edge TTS（讀 effective 旁白 + voice override）
+    ├── segment_elements.py    # 切圖（collage_cluster、panel-card、trim fraction）
+    ├── build_timeline.py      # 字幕分塊、SRT/VTT、hyperframes 預覽（讀 overrides）
+    ├── build_composition.py   # 產生 composition.json（resolved 合約，套用 overrides）
+    ├── validate_composition.py# 驗證 composition 忠實對應來源
+    └── render_final_video.py  # 讀 composition.json → letterbox 字幕燒錄
+
+# repo 根目錄（跨 task 共用）
+pipeline-ui/                # composition-driven 可視化編輯介面（瀏覽全部 task）
+pipeline_server.py          # 服務 UI + /apply /render /suggest（任一 task），預設 port 9001
 ```
 
 未來在任何專案要把圖片型投影片轉成旁白動畫 MP4，呼叫 `/skill-pptx-to-animated-video` 即可。

@@ -203,16 +203,16 @@ schema 再做對應。**建議先不要**，先把自有渲染器的中間格式
 ## 7. 不足 / 需重構的部分
 
 **建議重構（架構債）：**
-1. 🔴 **引入 generated/overrides/resolved 三層**，停止 server 直接覆寫 `metadata.json` / `narration_script.md`。
-2. 🔴 **把「全片設定」從程式碼抽成 config 檔**（aspect/fps/字幕樣式/語音）——目前散在 4 支 .py + CSS + ffmpeg 字串。
-3. 🟡 **把 per-layer `start` 的計算從 `segment_elements.py` 移到 `build_timeline.py`**，讓切圖與配音解耦
-   （切圖只管幾何，時間軸只管時間）。
-4. 🟡 **給每個 segment 穩定 `id`**，override 改用 id 綁定。
+1. ✅ **引入 generated/overrides/resolved 三層**，停止 server 直接覆寫 `metadata.json` / `narration_script.md`。（已完成）
+2. ✅ **把「全片設定」從程式碼抽成 config 檔**（aspect/fps/字幕樣式/語音）。（已完成）
+3. 🟡 **把 per-layer `start` 的計算從 `segment_elements.py` 移到 `build_timeline.py`**，讓切圖與配音解耦。
+   （部分：duration 已解耦、start 仍 baked + clamp，未完全移走）
+4. ✅ **給每個 segment 穩定 `id`**，override 改用 id 綁定。（已完成，於 composition.json 推導）
 
 **建議補功能：**
-5. **OCR**（最大缺口）：補 `ocr_text` → 解鎖真 AI storyboard、文字編輯、可靠 type 分類。
-6. **confidence 分數** → UI 標紅可疑切塊。
-7. **UI 上的切圖修正**（合併/拆分/調 bbox），而非只能改 .py 或對話。
+5. ⬜ **OCR**（最大缺口）：補 `ocr_text` → 解鎖真 AI storyboard、文字編輯、可靠 type 分類。
+6. ⬜ **confidence 分數** → UI 標紅可疑切塊。
+7. 🟡 **UI 上的切圖修正**（合併/拆分/調 bbox）。（部分：時間/動畫/旁白/語音已可編；切圖本身尚不可改）
 
 **可保留 / 不要動：**
 - `segment_elements.py` 的偵測核心、0px 驗證、debug 可視化、draft 預覽器、letterbox 字幕。
@@ -227,24 +227,39 @@ schema 再做對應。**建議先不要**，先把自有渲染器的中間格式
 
 ## 8. 建議開發優先順序
 
+> 進度圖例：✅ 完成　🟡 部分完成　⬜ 未做。最後更新：2026-06-18（session 4）。
+
 ```
 P0（地基，不做後面都會返工）
-  1. 決定渲染路線：自製渲染器 vs HyperFrames（第 0 節）
-  2. 抽出 project_config / voice_config / caption_config 三個 config 檔
-  3. 建立 generated/overrides/resolved 三層；server 停止覆寫 metadata
-  4. 給 segment 穩定 id
+  ✅ 1. 決定渲染路線：自製渲染器 vs HyperFrames（第 0 節）→ 走 A、留可替換合約
+  ✅ 2. 抽出 project_config / voice_config / caption_config 三個 config 檔
+  ✅ 3. 建立 generated/overrides/resolved 三層；server 停止覆寫 metadata
+  ✅ 4. 給 segment 穩定 id（在 composition.json 推導，不必重切圖）
 
 P1（解開順序耦合，讓 UI 流程能照順序跑）
-  5. 把 per-layer start 計算移到 build_timeline（切圖↔配音解耦）
-  6. aspect ratio 設計成「重跑 pipeline 參數」，UI 上明確標示改它要重切
+  🟡 5. 解耦 TTS↔切圖：duration 已改成「只對編輯過的頁面」從當前音檔重新量測（需 ffprobe），
+        旁白/語音 override 已貫穿 TTS+字幕+composition。但 per-layer start 仍 baked 在切圖
+        （以 clamp 夾進視窗），尚未真正移到 build_timeline 重算。
+  ⬜ 6. aspect ratio 設計成「重跑 pipeline 參數」（canvas 已進 config，但改它還不會重切/重渲）
 
 P2（解鎖智慧編輯）
-  7. 加 OCR → ocr_text + confidence
-  8. UI 切圖修正（合併/拆分/bbox），寫進 overrides 而非 metadata
+  ⬜ 7. 加 OCR → ocr_text + confidence
+  🟡 8. UI 編輯寫進 overrides：start/duration/animation/旁白/語音 已可編（pipeline-ui 直接編輯
+        控制項，所見即所得）。但「切圖修正」（合併/拆分/調 bbox）尚未做。
 
 P3（打磨）
-  9. 字幕 forced-alignment、PPTX 直通、HyperFrames 接口（若 P0 選了它）
- 10. 收斂 3 份 script 副本到單一 skill
+  ⬜ 9. 字幕 forced-alignment、PPTX 直通、HyperFrames 接口
+  ⬜ 10. 收斂 3 份 script 副本到單一 skill
+```
+
+### 另外完成（原 P 清單沒列，但 session 4 做掉的架構鍵石）
+
+```
+  ✅ composition.json「resolved 合約」（build_composition.py + validate_composition.py）
+  ✅ render_final_video.py 改讀 composition.json（第一個 adapter，overrides 進到成片）
+  ✅ 瀏覽器 draft 預覽改讀 composition.json（第 10.4，預覽=成片同源，消除漂移）
+  ✅ 共用版 composition-driven pipeline-ui（repo 根目錄，瀏覽全部 task）+ 多 task server
+  ✅ pipeline-ui 直接編輯控制項（旁白/語音/layer 時間動畫）→ 寫結構化 overrides
 ```
 
 ---

@@ -57,3 +57,31 @@
 12. cause sometimes the slide have some content at the very bottom position, i dont know if you could analyze them and avoid, or make the slide a little bits smaller but leave some space at the bottom? or u have some other advice can let me know
 13. very good so far, can you update the skill?
 14. okay, can you summarize our work today, also include 2026-06-12-160829 and 2026-06-12-164543 these two. I want one file save all of my prompt, and then generate a work report. Then update README.
+
+---
+
+## Session 4 — 2026-06-18（架構重整：合約 + overrides + 可視化編輯 UI）
+
+1. pull the project from https://github.com/ChenYuHsu413/2026.6.15HW99mypptAnim.git
+2. can you briefly study this project first, and then we will discuss about what we have to improve
+3. 我想先跟你討論目前這個專案的架構與下一步規劃（**只分析、不改任何檔案**：切圖邏輯、輸出資料、是否足以支援 UI 編輯與 HyperFrames、該補哪些 metadata、流程怎麼設計；產出分析報告）
+4. 你可以先幫我把這份分析完整的存成一個檔案嗎 我要慢慢看（→ `ANALYSIS_REPORT.md`）
+5. 先幫我推送上去 我可能要晚點決定
+6. 我們先來就第一個部分進行討論（**只討論**：自製渲染器 vs HyperFrames 的優劣；釐清「我一直以為是用他的 skill 在切圖」的誤會）
+7. 好 那就先走 A 留下可替換成 Hyperframe 渲染的空間，這樣對現階段來說好像比較合理？
+8. 可以把這個補進 analysis 然後對阿 draft 要走同一份合約嗎（→ 第 10 節）
+9. 第二題也來討論一下，我記得當初設計是 PPTX 為主 不知道為什麼變成只讀 PDF 了
+10. 主要還是 NotebookLM 圖片型 就照範圍 2 補進去然後 push（→ 第 11 節：UI 吃 PPTX、後端自動轉 PDF）
+11. 好 開始實作抽成三個 config（→ project/voice/caption config + config.py）
+12. 繼續（→ `composition.json` resolved 合約 + 驗證器）
+13. 先 2（→ overrides 層；修掉 pipeline_server 直接覆寫 metadata 的 bug）
+14. 2（→ 旁白/語音 override 接進 TTS + timeline；duration 從當前音檔重新量測、解耦切圖）
+15. 1（→ 瀏覽器 draft 預覽改讀 composition.json，預覽=成片同源）
+16. 我的瀏覽器無法顯示網頁（→ 診斷出 WinError 10013、8000-8099 port 被保留擋掉，改用 9000/9001）
+17. 有看到了 可以先關掉 但是我希望調整 UI 的介面可以像 pipeline-ui 裡面的 index 那樣
+    （→ 共用版 composition-driven pipeline-ui + 多 task server；經 AskUserQuestion 確認：所有 task 共用、含編輯）
+18. 正常 可以關掉 server 但我想問的是 notes 的用意是什麼？
+19. 2（→ 把唯讀欄位換成直接編輯控制項：旁白文字、語音/語速、選中 layer 的 start/duration/animation，寫結構化 overrides，所見即所得；notes 保留當補充）
+20. 幫我開一下 server
+21. 用完了 幫我關掉 謝謝
+22. 更新 README 說明新的 pipeline-ui 跟編輯流程，把對話紀錄與工作紀錄存檔，analysis_report 完成項目打勾
