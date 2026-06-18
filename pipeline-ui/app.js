@@ -8,23 +8,27 @@ const taskSelect=document.getElementById('taskSelect'),themeSelect=document.getE
   playBtn=document.getElementById('playBtn'),hfBtn=document.getElementById('hfBtn'),renderBtn=document.getElementById('renderBtn'),
   timelineEl=document.getElementById('timeline'),statsEl=document.getElementById('stats'),
   narrationEl=document.getElementById('narration'),audioEl=document.getElementById('audio'),
+  saveNarration=document.getElementById('saveNarration'),voiceSel=document.getElementById('voiceSel'),
+  rateInp=document.getElementById('rateInp'),voiceApply=document.getElementById('voiceApply'),
+  layerEdit=document.getElementById('layerEdit'),leName=document.getElementById('leName'),
+  leStart=document.getElementById('leStart'),leDur=document.getElementById('leDur'),
+  leAnim=document.getElementById('leAnim'),leApply=document.getElementById('leApply'),
   layerList=document.getElementById('layerList'),notesEl=document.getElementById('notes'),
   renderDialog=document.getElementById('renderDialog'),renderFrom=document.getElementById('renderFrom'),
   renderTo=document.getElementById('renderTo'),renderGo=document.getElementById('renderGo'),
   renderClose=document.getElementById('renderClose'),renderLog=document.getElementById('renderLog');
 
 const S={tasks:[],taskPath:null,canvas:{width:1920,height:1080},timing:null,slides:[],meta:new Map,
-  subMap:{},selected:null,view:'composite',showSkipped:false,playing:false,timers:[],selLayer:null};
+  subMap:{},selected:null,view:'composite',showSkipped:false,playing:false,timers:[],selLayer:null,rev:0};
 const root=new URL('../',window.location.href).href;
 function tRoot(p){return new URL(`${p}/`,root).href;}
-async function fj(p){const r=await fetch(p);if(!r.ok)throw Error(`${r.status}`);return r.json();}
+async function fj(p){const r=await fetch(p,{cache:'no-store'});if(!r.ok)throw Error(`${r.status}`);return r.json();}
 
 // ── Load (driven by composition.json -- the resolved contract) ───────
 async function loadTask(tp){
   const r=tRoot(tp);
   const comp=await fj(`${r}composition.json`);
   S.taskPath=tp;S.canvas=comp.canvas;
-  // Normalize composition into the shape the render functions expect.
   S.slides=comp.slides.map(s=>({
     slide:s.index,width:comp.canvas.width,height:comp.canvas.height,duration:s.duration,
     layers:(s.layers||[]).map(l=>({
@@ -36,10 +40,9 @@ async function loadTask(tp){
   S.meta=new Map(S.slides.map(s=>[s.slide,s]));
   S.timing={};
   for(const s of comp.slides) S.timing[sk(s.index)]={script:s.narration,voiceover_file:s.audio,start:s.start,end:s.end};
-  // Subtitles for synced captions during Play (still produced by build_timeline).
   S.subMap={};
   try{
-    const srt=await(await fetch(`${r}narration/subtitles.srt`)).text(),cues=[];
+    const srt=await(await fetch(`${r}narration/subtitles.srt`,{cache:'no-store'})).text(),cues=[];
     for(const b of srt.split(/\n\n+/)){
       const ln=b.trim().split('\n');if(ln.length<3)continue;
       const m=ln[1].match(/([\d:,]+)\s*-->\s*([\d:,]+)/);if(!m)continue;
@@ -68,6 +71,21 @@ async function init(){
   }catch(e){document.body.innerHTML=`<div style="color:#fb7185;padding:40px">${e.message}</div>`;}
 }
 
+// ── Apply a structured edit -> server -> reload (WYSIWYG) ─────────────
+async function applyEdit(overrides, heavy){
+  statusEl.textContent = heavy ? 'Applying… (re-running TTS, may take a moment)' : 'Applying…';
+  try{
+    const res=await fetch('/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({task:S.taskPath,overrides})});
+    const d=await res.json().catch(()=>({status:'error',message:'bad response'}));
+    if(d.status!=='ok'){statusEl.textContent='Apply failed: '+(d.message||'');return;}
+    S.rev++;
+    const cur=S.selected?.slide;
+    await loadTask(S.taskPath);
+    if(cur!=null)selectSlide(cur);
+    statusEl.textContent='Applied ✓';
+  }catch(e){statusEl.textContent='No server — run pipeline_server.py to edit';}
+}
+
 // ── Slides ──────────────────────────────────────────────────────────
 function renderSlideList(){
   slideList.innerHTML='';
@@ -81,7 +99,7 @@ function renderSlideList(){
 
 function selectSlide(n){
   const s=S.slides.find(x=>x.slide===n);if(!s)return;
-  stopPlay();S.selected=s;S.selLayer=null;
+  stopPlay();S.selected=s;S.selLayer=null;layerEdit.hidden=true;
   document.querySelectorAll('.slide-btn').forEach(b=>b.classList.toggle('active',b.textContent.includes(`Slide ${pad(n)}`)));
   renderSlide();
 }
@@ -95,18 +113,29 @@ function renderSlide(){
   notesEl.value = localStorage.getItem(nk)||'';
 }
 
-// ── Save notes (to overrides.json via the server, if running) ────────
+// ── Notes (supplementary free-text -> overrides.json) ────────────────
 notesEl.addEventListener('input',()=>{
   const nk = `notes-${S.taskPath}-${sk(S.selected.slide)}`;
   localStorage.setItem(nk, notesEl.value);
   fetch('/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({task:S.taskPath,overrides:{[sk(S.selected.slide)]:{notes:notesEl.value}}})}).catch(()=>{});
 });
 
+// ── Edit handlers ───────────────────────────────────────────────────
+saveNarration.addEventListener('click',()=>{ if(S.selected) applyEdit({[sk(S.selected.slide)]:{narration:narrationEl.value}}, true); });
+voiceApply.addEventListener('click',()=>{ const v={voice:voiceSel.value}; if(rateInp.value.trim())v.rate=rateInp.value.trim(); applyEdit({voice:v}, true); });
+leApply.addEventListener('click',()=>{
+  if(!S.selected||!S.selLayer)return;
+  const ov={animation:leAnim.value};
+  const st=parseFloat(leStart.value),du=parseFloat(leDur.value);
+  if(!isNaN(st))ov.start=st; if(!isNaN(du))ov.duration=du;
+  applyEdit({[sk(S.selected.slide)]:{layers:{[S.selLayer]:ov}}}, false);
+});
+
 function renderStats(s,layers){statsEl.innerHTML=`<dt>Canvas</dt><dd>${s.width}&times;${s.height}</dd><dt>Duration</dt><dd>${fmt(s.duration)}s</dd><dt>Layers</dt><dd>${layers.length}</dd>`;}
 
 function renderNarration(tim){
-  narrationEl.textContent=tim.script||'No narration.';
-  if(tim.voiceover_file){audioEl.src=`${tRoot(S.taskPath)}${tim.voiceover_file}`;audioEl.hidden=false;}else{audioEl.removeAttribute('src');audioEl.hidden=true;}
+  narrationEl.value=tim.script||'';
+  if(tim.voiceover_file){audioEl.src=`${tRoot(S.taskPath)}${tim.voiceover_file}?v=${S.rev}`;audioEl.hidden=false;}else{audioEl.removeAttribute('src');audioEl.hidden=true;}
 }
 
 function renderPreview(s,layers){
@@ -165,6 +194,8 @@ function selectLayer(name,num){
   document.querySelectorAll('.stage-preview .layer').forEach(e=>e.classList.toggle('highlight',e.dataset.layer===name));
   document.querySelectorAll('.stage-preview .layer-idx').forEach(e=>{e.style.display='none'});
   if(name){const el=document.querySelector(`.stage-preview .layer.highlight`);if(el){const p=el.parentElement;if(p) p.querySelector('.layer-idx').style.display='flex';}}
+  const s=S.selected,l=(S.meta.get(s.slide)||s).layers.find(x=>x.name===name);
+  if(l){leName.textContent=name;leStart.value=l.start;leDur.value=l.duration;leAnim.value=l.animation;layerEdit.hidden=false;}
 }
 
 // ── Play ────────────────────────────────────────────────────────────

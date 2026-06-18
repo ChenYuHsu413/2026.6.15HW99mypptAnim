@@ -72,11 +72,33 @@
       </section>
       <section class="card">
         <div class="panel-title">Narration</div>
-        <p id="narration" class="narration"></p>
+        <textarea id="narration" class="narration-edit" placeholder="Slide narration…"></textarea>
+        <div class="edit-row"><button id="saveNarration" class="hf-btn">Save narration (re-TTS)</button></div>
         <audio id="audio" controls></audio>
+        <div class="edit-row voice-row">
+          <select id="voiceSel">
+            <option value="zh-TW-HsiaoChenNeural">HsiaoChen (female)</option>
+            <option value="zh-TW-YunJheNeural">YunJhe (male)</option>
+            <option value="zh-TW-HsiaoYuNeural">HsiaoYu (female)</option>
+          </select>
+          <input id="rateInp" placeholder="rate e.g. -8%">
+          <button id="voiceApply" class="hf-btn">Apply voice (all)</button>
+        </div>
       </section>
       <section class="card layers-card">
         <div class="panel-title">Layers</div>
+        <div id="layerEdit" class="layer-edit" hidden>
+          <div class="layer-edit-name" id="leName"></div>
+          <div class="layer-edit-fields">
+            <label>start<input id="leStart" type="number" step="0.05" min="0"></label>
+            <label>dur<input id="leDur" type="number" step="0.05" min="0.1"></label>
+            <label>anim<select id="leAnim">
+              <option>fade-in-down</option><option>fade-in-up</option><option>fade-in</option>
+              <option>pop-in</option><option>zoom-in</option><option>wipe-in</option><option>draw-in</option>
+            </select></label>
+            <button id="leApply" class="hf-btn">Apply</button>
+          </div>
+        </div>
         <div id="layerList" class="layer-list"></div>
       </section>
     </aside>
