@@ -15,6 +15,8 @@ import re
 import sys
 from pathlib import Path
 
+import config
+
 ROOT = Path.cwd()
 AUDIO = ROOT / "audio"
 SCRIPT = ROOT / "narration" / "narration_script.md"
@@ -35,8 +37,8 @@ def parse_script():
 async def main():
     import edge_tts
 
-    voice = sys.argv[1] if len(sys.argv) > 1 else "zh-TW-HsiaoChenNeural"
-    rate = sys.argv[2] if len(sys.argv) > 2 else "-8%"
+    voice = sys.argv[1] if len(sys.argv) > 1 else config.VOICE["voice"]
+    rate = sys.argv[2] if len(sys.argv) > 2 else config.VOICE["rate"]
     AUDIO.mkdir(exist_ok=True)
     sections = parse_script()
     if not sections:

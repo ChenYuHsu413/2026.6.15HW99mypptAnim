@@ -12,12 +12,16 @@ import math
 import re
 from pathlib import Path
 
+import config
+
 ROOT = Path.cwd()
 OUT = ROOT / "output"
 AUDIO = ROOT / "audio"
 NARRATION = ROOT / "narration"
 HYPER = ROOT / "hyperframes"
-WIDTH, HEIGHT, FPS = 1920, 1080, 30
+WIDTH = config.PROJECT["canvas"]["width"]
+HEIGHT = config.PROJECT["canvas"]["height"]
+FPS = config.PROJECT["canvas"]["fps"]
 
 
 def parse_script():
@@ -44,7 +48,7 @@ def srt_time(seconds):
     return f"{whole // 3600:02d}:{whole % 3600 // 60:02d}:{whole % 60:02d},{ms:03d}"
 
 
-SUB_CHUNK_MAX = 32  # CJK chars per subtitle cue (~1-2 lines at FontSize=11)
+SUB_CHUNK_MAX = config.CAPTION["chunk_max_chars"]  # CJK chars per subtitle cue (~1-2 lines at FontSize=11)
 
 
 def chunk_narration(text, max_chars=SUB_CHUNK_MAX):
@@ -109,7 +113,7 @@ def main():
         }
         # Subtitle: split the slide's narration into short cues timed
         # proportionally to their char count across the speech window.
-        speak_end = end - 0.35  # tail silence stays uncaptioned
+        speak_end = end - config.CAPTION["tail_silence"]  # tail silence stays uncaptioned
         chunks = chunk_narration(script)
         if chunks:
             total_chars = sum(len(c) for c in chunks)

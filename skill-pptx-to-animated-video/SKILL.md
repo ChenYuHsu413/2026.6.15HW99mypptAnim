@@ -17,6 +17,23 @@ pip install opencv-python pymupdf pillow edge-tts
 ffmpeg: system install, or `npm i ffmpeg-static ffprobe-static` in the project,
 or set `FFMPEG_PATH`. Scripts auto-discover it.
 
+## Configuration
+
+Canvas / voice / caption settings live in three JSON files under this skill's
+`config/` folder (loaded by `scripts/config.py`):
+
+- `project_config.json` — `canvas` (aspect/width/height/fps) + `render`
+  (crf/preset/transition/sample_rate).
+- `voice_config.json` — TTS `engine`/`voice`/`rate` (CLI args to `tts_edge.py`
+  still override these).
+- `caption_config.json` — subtitle chunking + burned-in ASS style + letterbox
+  band.
+
+These hold the project defaults. To customise one deck without touching the
+skill, drop a file of the same name in the **task's project root** (cwd); it is
+deep-merged over the defaults, so you only specify the keys you change. This is
+the layer a UI writes per task.
+
 ## Workflow
 
 `SKILL_DIR` = this skill's folder; run scripts as `python "<SKILL_DIR>/scripts/<name>.py"`.

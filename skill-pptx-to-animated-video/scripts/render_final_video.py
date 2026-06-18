@@ -18,14 +18,20 @@ import cv2
 import numpy as np
 from PIL import Image
 
+import config
+
 ROOT = Path.cwd()
 OUT = ROOT / "output"
 AUDIO = ROOT / "audio"
 NARRATION = ROOT / "narration"
 FINAL = ROOT / "final"
-WIDTH, HEIGHT, FPS = 1920, 1080, 30
-TRANSITION = 0.5
-SAMPLE_RATE = 48000
+WIDTH = config.PROJECT["canvas"]["width"]
+HEIGHT = config.PROJECT["canvas"]["height"]
+FPS = config.PROJECT["canvas"]["fps"]
+TRANSITION = config.PROJECT["render"]["transition"]
+SAMPLE_RATE = config.PROJECT["render"]["sample_rate"]
+CRF = str(config.PROJECT["render"]["crf"])
+PRESET = config.PROJECT["render"]["preset"]
 
 
 def find_ffmpeg():
@@ -210,7 +216,7 @@ def main():
          "-f", "rawvideo", "-pix_fmt", "bgr24", "-s", f"{WIDTH}x{HEIGHT}",
          "-r", str(FPS), "-i", "pipe:0",
          "-i", str(audio_path),
-         "-c:v", "libx264", "-preset", "veryfast", "-crf", "18",
+         "-c:v", "libx264", "-preset", PRESET, "-crf", CRF,
          "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k",
          "-movflags", "+faststart", "-shortest", str(out_path)],
         stdin=subprocess.PIPE,
@@ -257,13 +263,25 @@ def main():
     print(f"wrote {out_path}")
 
     # Burned-subtitles version.
+    # Letterbox: shrink slide to the top, a dark band fills the bottom for
+    # subtitles -- subtitles never overlap slide content this way.
     subbed = FINAL / "final_video_with_voiceover_and_subtitles.mp4"
+    cap = config.CAPTION
+    style = (
+        f"FontName={cap['font']},FontSize={cap['size']},"
+        f"PrimaryColour={cap['primary_colour']},BorderStyle={cap['border_style']},"
+        f"Outline={cap['outline']},Shadow={cap['shadow']},BackColour={cap['back_colour']},"
+        f"MarginL={cap['margin_l']},MarginR={cap['margin_r']},MarginV={cap['margin_v']}"
+    )
+    vf = (
+        f"scale={WIDTH}:{cap['letterbox_height']},"
+        f"pad={WIDTH}:{HEIGHT}:0:0:color={cap['band_color']},"
+        f"subtitles=narration/subtitles.srt:force_style='{style}'"
+    )
     result = subprocess.run(
         [str(FFMPEG), "-y", "-v", "error", "-i", str(out_path),
-         # Letterbox: shrink slide to top, dark band fills the bottom 120px
-         # for subtitles -- subtitles never overlap slide content this way.
-         "-vf", "scale=1920:960,pad=1920:1080:0:0:color=0x101010,subtitles=narration/subtitles.srt:force_style='FontName=Microsoft JhengHei,FontSize=11,PrimaryColour=&H00FFFFFF,BorderStyle=3,Outline=8,Shadow=0,BackColour=&H66000000,MarginL=30,MarginR=30,MarginV=10'",
-         "-c:v", "libx264", "-preset", "veryfast", "-crf", "18",
+         "-vf", vf,
+         "-c:v", "libx264", "-preset", PRESET, "-crf", CRF,
          "-c:a", "copy", str(subbed)],
         cwd=str(ROOT), capture_output=True, text=True,
     )

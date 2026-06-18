@@ -25,12 +25,14 @@ import cv2
 import numpy as np
 from PIL import Image
 
+import config
+
 ROOT = Path.cwd()
 OUT = ROOT / "output"
 AUDIO = ROOT / "audio"
 DEBUG = ROOT / "work_preview" / "element_debug"
 GALLERY = ROOT / "work_preview"
-WIDTH, HEIGHT = 1920, 1080
+WIDTH, HEIGHT = config.PROJECT["canvas"]["width"], config.PROJECT["canvas"]["height"]
 
 
 def find_ffprobe():

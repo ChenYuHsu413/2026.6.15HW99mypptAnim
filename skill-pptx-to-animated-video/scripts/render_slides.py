@@ -13,7 +13,9 @@ import fitz  # pymupdf
 import numpy as np
 from PIL import Image
 
-WIDTH, HEIGHT = 1920, 1080
+import config
+
+WIDTH, HEIGHT = config.PROJECT["canvas"]["width"], config.PROJECT["canvas"]["height"]
 
 
 def main():

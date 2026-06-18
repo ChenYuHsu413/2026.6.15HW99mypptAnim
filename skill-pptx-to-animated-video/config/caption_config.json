@@ -1,0 +1,16 @@
+{
+  "chunk_max_chars": 32,
+  "tail_silence": 0.35,
+  "letterbox_height": 960,
+  "band_color": "0x101010",
+  "font": "Microsoft JhengHei",
+  "size": 11,
+  "primary_colour": "&H00FFFFFF",
+  "back_colour": "&H66000000",
+  "border_style": 3,
+  "outline": 8,
+  "shadow": 0,
+  "margin_l": 30,
+  "margin_r": 30,
+  "margin_v": 10
+}
