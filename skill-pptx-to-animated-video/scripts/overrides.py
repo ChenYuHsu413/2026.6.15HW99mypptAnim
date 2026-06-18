@@ -49,3 +49,19 @@ def narration(overrides, slide_n):
     """Return overridden narration text for a slide, or None if unedited."""
     sl = overrides.get(slide_key(slide_n)) or {}
     return sl.get("narration")
+
+
+def voice(overrides):
+    """Top-level voice override: {"voice": ..., "rate": ...} (empty if none)."""
+    return overrides.get("voice") or {}
+
+
+def resolved_start(baked_start, layer_ov, slide_duration, layer_duration):
+    """Layer entrance time: override if set, else baked, capped to the window.
+
+    The cap only bites when the slide got shorter than the baked spread
+    assumed (e.g. faster speech); with an unchanged window it is a no-op, so
+    unedited output is identical.
+    """
+    start = layer_ov.get("start", baked_start)
+    return min(start, round(slide_duration - layer_duration, 2))

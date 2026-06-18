@@ -17,6 +17,7 @@ import json
 from pathlib import Path
 
 import config
+import media
 import overrides
 
 ROOT = Path.cwd()
@@ -45,15 +46,22 @@ def caption_style():
 def main():
     timing = json.loads((NARRATION / "narration_timing.json").read_text(encoding="utf-8"))
     ov = overrides.load()
+    voice_changed = bool(overrides.voice(ov))
     slides = []
     for p in sorted(OUT.glob("slide_*/metadata.json")):
         meta = json.loads(p.read_text(encoding="utf-8"))
         n = meta["slide"]
         key = f"slide_{n:02d}"
         t = timing.get(key, {})
+        narration = overrides.narration(ov, n)
+        # Refresh duration from current audio only for edited slides.
+        refresh = voice_changed or narration is not None
+        audio_path = ROOT / f"audio/slide_{n:02d}_voiceover.mp3"
+        duration = media.slide_duration(audio_path, meta["duration"]) if refresh else meta["duration"]
         layers = []
         for l in meta["layers"]:
             o = overrides.layer(ov, n, l["name"])  # {} if unedited
+            layer_dur = o.get("duration", l["duration"])
             layers.append(
                 {
                     "id": overrides.stable_id(n, l["name"]),
@@ -62,11 +70,10 @@ def main():
                     "bbox": [l["x"], l["y"], l["width"], l["height"]],
                     "z": o.get("z", l["z_index"]),
                     "enter": {"type": o.get("animation", l["animation"]), "intensity": o.get("intensity", 1.0)},
-                    "start": o.get("start", l["start"]),
-                    "duration": o.get("duration", l["duration"]),
+                    "start": overrides.resolved_start(l["start"], o, duration, layer_dur),
+                    "duration": layer_dur,
                 }
             )
-        narration = overrides.narration(ov, n)
         slides.append(
             {
                 "index": n,
@@ -74,7 +81,7 @@ def main():
                 "audio": t.get("voiceover_file"),
                 "start": t.get("start"),
                 "end": t.get("end"),
-                "duration": meta["duration"],
+                "duration": duration,
                 "narration": narration if narration is not None else t.get("script", ""),
                 "layers": layers,
             }

@@ -34,6 +34,31 @@ skill, drop a file of the same name in the **task's project root** (cwd); it is
 deep-merged over the defaults, so you only specify the keys you change. This is
 the layer a UI writes per task.
 
+### Per-edit overrides (`overrides.json`)
+
+User/AI edits go in `overrides.json` at the project root (`scripts/overrides.py`),
+NOT into the generated artifacts — `metadata.json` and `narration_script.md`
+stay pristine. Schema is keyed by slide:
+
+```json
+{
+  "voice": { "voice": "zh-TW-YunJheNeural", "rate": "-10%" },
+  "slide_03": {
+    "narration": "edited narration text",
+    "notes": "free-form note for the agent",
+    "layers": { "slide_03_chart_01.png": { "start": 1.2, "animation": "zoom-in" } }
+  }
+}
+```
+
+`tts_edge.py` speaks the effective narration (override text if present) with the
+voice override; `build_timeline.py` and `build_composition.py` apply overrides
+when building subtitles/timing and the resolved `composition.json`. A slide's
+duration is re-probed from its current audio **only when that slide's narration
+or the voice changed** — so editing voice/text no longer requires re-running
+segmentation, and unedited slides stay byte-identical. (Needs ffprobe; without
+it, duration falls back to the baked value.)
+
 ## Workflow
 
 `SKILL_DIR` = this skill's folder; run scripts as `python "<SKILL_DIR>/scripts/<name>.py"`.

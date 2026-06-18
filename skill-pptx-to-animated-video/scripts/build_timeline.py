@@ -13,6 +13,8 @@ import re
 from pathlib import Path
 
 import config
+import media
+import overrides
 
 ROOT = Path.cwd()
 OUT = ROOT / "output"
@@ -86,6 +88,8 @@ def chunk_narration(text, max_chars=SUB_CHUNK_MAX):
 def main():
     scripts = parse_script()
     metadatas = load_metadatas()
+    ov = overrides.load()
+    voice_changed = bool(overrides.voice(ov))
     timing = {}
     srt, vtt = [], ["WEBVTT", ""]
     cursor = 0.0
@@ -93,9 +97,15 @@ def main():
     for meta in metadatas:
         n = meta["slide"]
         key = f"slide_{n:02d}"
-        script = scripts.get(n, "")
+        ov_narr = overrides.narration(ov, n)
+        script = ov_narr if ov_narr is not None else scripts.get(n, "")
+        # Refresh duration from the current audio only for edited slides;
+        # unedited slides keep their baked duration (so output is identical).
+        refresh = voice_changed or ov_narr is not None
+        audio_path = ROOT / f"audio/slide_{n:02d}_voiceover.mp3"
+        duration = media.slide_duration(audio_path, meta["duration"]) if refresh else meta["duration"]
         start = round(cursor, 2)
-        end = round(cursor + meta["duration"], 2)
+        end = round(cursor + duration, 2)
         timing[key] = {
             "voiceover_file": f"audio/slide_{n:02d}_voiceover.mp3",
             "start": start,

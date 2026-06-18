@@ -175,16 +175,28 @@ def apply_overrides(incoming):
             logs.append(f"[{key}] notes: {ov['notes'][:120]}")
             log_info(f"  {key}: notes present")
 
-    # ── Rebuild the resolved contract (overrides applied here) ─────────
-    log_info("Rebuilding composition.json ...")
-    build_script = SKILL_DIR / "build_composition.py"
-    if build_script.exists():
-        r = run_python(build_script)
-        logs.append(f"composition.json: {r.stdout.strip() or '(ok)'}")
+    # Narration or voice edits change the audio, so they need a fresh
+    # TTS + timeline pass; layer/notes edits only need the composition.
+    audio_changed = bool(merged.get("voice")) or any(
+        isinstance(v, dict) and v.get("narration") for v in merged.values()
+    )
+
+    def run_step(name, label):
+        script = SKILL_DIR / name
+        if not script.exists():
+            logs.append(f"{name} not found at {script}")
+            return
+        r = run_python(script)
+        logs.append(f"{label}: {r.stdout.strip() or '(ok)'}")
         if r.returncode:
-            logs.append(f"composition error: {redact(r.stderr.strip())}")
-    else:
-        logs.append(f"build_composition.py not found at {build_script}")
+            logs.append(f"{label} error: {redact(r.stderr.strip())}")
+
+    if audio_changed:
+        log_info("Narration/voice changed -- re-running TTS + timeline ...")
+        run_step("tts_edge.py", "TTS")
+        run_step("build_timeline.py", "Timeline")
+    log_info("Rebuilding composition.json ...")
+    run_step("build_composition.py", "composition.json")
 
     return logs
 

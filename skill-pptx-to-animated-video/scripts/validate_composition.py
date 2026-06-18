@@ -12,6 +12,7 @@ import json
 import sys
 from pathlib import Path
 
+import media
 import overrides
 
 ROOT = Path.cwd()
@@ -28,6 +29,7 @@ def main():
         m = json.loads(p.read_text(encoding="utf-8"))
         metas[m["slide"]] = m
 
+    voice_changed = bool(overrides.voice(ov))
     errors = []
     seen_ids = set()
 
@@ -41,8 +43,11 @@ def main():
             continue
         key = f"slide_{n:02d}"
         t = timing.get(key, {})
-        if s["duration"] != meta["duration"]:
-            errors.append(f"{key}: duration {s['duration']} != {meta['duration']}")
+        refresh = voice_changed or overrides.narration(ov, n) is not None
+        audio_path = ROOT / f"audio/slide_{n:02d}_voiceover.mp3"
+        exp_slide_dur = media.slide_duration(audio_path, meta["duration"]) if refresh else meta["duration"]
+        if s["duration"] != exp_slide_dur:
+            errors.append(f"{key}: duration {s['duration']} != {exp_slide_dur}")
         if s["start"] != t.get("start") or s["end"] != t.get("end"):
             errors.append(f"{key}: window ({s['start']},{s['end']}) != ({t.get('start')},{t.get('end')})")
         if len(s["layers"]) != len(meta["layers"]):
@@ -53,8 +58,8 @@ def main():
             exp_id = overrides.stable_id(n, ml["name"])
             exp_z = o.get("z", ml["z_index"])
             exp_anim = o.get("animation", ml["animation"])
-            exp_start = o.get("start", ml["start"])
             exp_dur = o.get("duration", ml["duration"])
+            exp_start = overrides.resolved_start(ml["start"], o, exp_slide_dur, exp_dur)
             if cl["id"] != exp_id:
                 errors.append(f"{key}: id {cl['id']} != {exp_id}")
             if cl["id"] in seen_ids:
