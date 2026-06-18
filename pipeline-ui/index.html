@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pipeline Inspector</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Composition pipeline inspector</p>
+      <h1 id="taskTitle">Pipeline</h1>
+    </div>
+    <div class="topbar-actions">
+      <label class="tsel"><span>Task</span><select id="taskSelect"></select></label>
+      <label class="tsel"><span>Theme</span><select id="themeSelect">
+        <option value="dark">Dark</option><option value="light">Light</option>
+        <option value="slate">Slate</option><option value="warm">Warm</option>
+      </select></label>
+      <div class="status" id="status">Loading…</div>
+    </div>
+  </header>
+
+  <main class="app">
+    <aside class="sidebar">
+      <div class="panel-title">Slides</div>
+      <div id="slideList" class="slide-list"></div>
+    </aside>
+
+    <section class="viewer">
+      <div class="viewer-header">
+        <div>
+          <p class="eyebrow" id="slideLabel">Slide</p>
+          <h2 id="slideTitle">Select a slide</h2>
+        </div>
+        <div class="viewer-actions">
+          <button id="playBtn" class="play-btn">▶ Play slide</button>
+          <button id="hfBtn" class="hf-btn">Open in HyperFrames</button>
+          <button id="renderBtn" class="render-btn">MP4 export</button>
+          <label class="switch"><input type="checkbox" id="showSkipped"><span>Show skipped</span></label>
+        </div>
+      </div>
+
+      <div class="asset-tabs">
+        <button class="asset-tab active" data-view="composite">Composite</button>
+        <button class="asset-tab" data-view="original">Original</button>
+        <button class="asset-tab" data-view="background">Background</button>
+        <button class="asset-tab" data-view="debug">Debug</button>
+        <button class="asset-tab" data-view="gallery">Gallery</button>
+      </div>
+
+      <div class="preview-card">
+        <div id="preview" class="stage-preview"></div>
+        <img id="assetPreview" class="asset-preview" alt="">
+      </div>
+
+      <section class="notes-section">
+        <textarea id="notes" class="notes-input" placeholder="Write what you want to adjust on this slide…"></textarea>
+      </section>
+
+      <section class="timeline-panel">
+        <div class="panel-title">Layer timing</div>
+        <div id="timeline" class="timeline"></div>
+      </section>
+    </section>
+
+    <aside class="inspector">
+      <section class="card">
+        <div class="panel-title">Slide data</div>
+        <dl id="stats" class="stats"></dl>
+      </section>
+      <section class="card">
+        <div class="panel-title">Narration</div>
+        <p id="narration" class="narration"></p>
+        <audio id="audio" controls></audio>
+      </section>
+      <section class="card layers-card">
+        <div class="panel-title">Layers</div>
+        <div id="layerList" class="layer-list"></div>
+      </section>
+    </aside>
+
+    <div id="renderDialog" class="dialog" hidden>
+      <div class="dialog-card">
+        <h3>MP4 Export</h3>
+        <p class="eyebrow">Renders the final MP4 with voiceover + subtitles</p>
+        <label>From slide <input id="renderFrom" type="number" min="1" value="1" style="width:60px"></label>
+        <label style="margin-left:8px">to <input id="renderTo" type="number" min="1" value="1" style="width:60px"></label>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button id="renderGo" class="play-btn">Render</button>
+          <button id="renderClose" class="hf-btn">Cancel</button>
+        </div>
+        <pre id="renderLog" style="margin-top:10px;font-size:11px;color:var(--ok);white-space:pre-wrap;max-height:150px;overflow:auto"></pre>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js?v=1"></script>
+</body>
+</html>
