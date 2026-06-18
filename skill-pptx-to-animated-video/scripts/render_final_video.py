@@ -8,7 +8,6 @@ static frames reuse cached bytes, so rendering stays fast.
 
 import json
 import os
-import re
 import shutil
 import subprocess
 import sys
@@ -21,9 +20,7 @@ from PIL import Image
 import config
 
 ROOT = Path.cwd()
-OUT = ROOT / "output"
 AUDIO = ROOT / "audio"
-NARRATION = ROOT / "narration"
 FINAL = ROOT / "final"
 WIDTH = config.PROJECT["canvas"]["width"]
 HEIGHT = config.PROJECT["canvas"]["height"]
@@ -54,13 +51,16 @@ def find_ffmpeg():
 FFMPEG = find_ffmpeg()
 
 
+def load_composition():
+    """The resolved contract -- overrides already applied by build_composition."""
+    p = ROOT / "composition.json"
+    if not p.exists():
+        raise SystemExit("composition.json not found -- run build_composition.py first")
+    return json.loads(p.read_text(encoding="utf-8"))
+
+
 def slide_numbers():
-    nums = []
-    for p in sorted(OUT.glob("slide_*/metadata.json")):
-        m = re.match(r"slide_(\d+)", p.parent.name)
-        if m:
-            nums.append(int(m.group(1)))
-    return nums
+    return [s["index"] for s in load_composition()["slides"]]
 
 
 def ease(p):
@@ -68,24 +68,38 @@ def ease(p):
 
 
 def load_timing():
-    return json.loads((NARRATION / "narration_timing.json").read_text(encoding="utf-8"))
+    """Per-slide voiceover + window, in the shape the render loop expects."""
+    timing = {}
+    for s in load_composition()["slides"]:
+        timing[f"slide_{s['index']:02d}"] = {
+            "voiceover_file": s["audio"],
+            "start": s["start"],
+            "end": s["end"],
+        }
+    return timing
 
 
 def load_slides():
     slides = []
-    for n in slide_numbers():
-        d = OUT / f"slide_{n:02d}"
-        meta = json.loads((d / "metadata.json").read_text(encoding="utf-8"))
-        bg = cv2.cvtColor(np.array(Image.open(d / "background.png").convert("RGB")), cv2.COLOR_RGB2BGR)
+    for s in load_composition()["slides"]:
+        n = s["index"]
+        bg = cv2.cvtColor(np.array(Image.open(ROOT / s["background"]).convert("RGB")), cv2.COLOR_RGB2BGR)
         layers = []
-        for layer in meta["layers"]:
-            if layer.get("type") == "key_point_card":
+        for l in s["layers"]:
+            if l["type"] == "key_point_card":
                 continue
-            rgba = np.array(Image.open(d / layer["name"]).convert("RGBA"))
+            rgba = np.array(Image.open(ROOT / l["image"]).convert("RGBA"))
             bgr = cv2.cvtColor(rgba[:, :, :3], cv2.COLOR_RGB2BGR)
             alpha = rgba[:, :, 3].astype(np.float32) / 255.0
-            layers.append({"meta": layer, "bgr": bgr, "alpha": alpha})
-        slides.append({"meta": meta, "bg": bg, "layers": layers})
+            meta = {
+                "x": l["bbox"][0], "y": l["bbox"][1],
+                "width": l["bbox"][2], "height": l["bbox"][3],
+                "animation": l["enter"]["type"],
+                "start": l["start"], "duration": l["duration"],
+                "type": l["type"],
+            }
+            layers.append({"meta": meta, "bgr": bgr, "alpha": alpha})
+        slides.append({"meta": s, "bg": bg, "layers": layers})
     return slides
 
 

@@ -82,8 +82,11 @@ the layer a UI writes per task.
    metadata + timing. This is the single document renderers/adapters consume.
 7. **Render — only after the user approves the cuts** (it's the expensive
    step): `render_final_video.py` → `final/final_video_with_voiceover.mp4` +
-   burned-subtitles version. Run it in the background; it prints one line per
-   slide.
+   burned-subtitles version. It consumes `composition.json` for layer geometry,
+   animation and timing (so any overrides take effect here) -- run
+   `build_composition.py` first. Run it in the background; it prints one line
+   per slide. (Audio MP3s and subtitles.srt are still produced by the
+   TTS/timeline steps; wiring overrides through to those is a follow-up.)
 
 ## Quality bar for segmentation (learned from human review)
 
