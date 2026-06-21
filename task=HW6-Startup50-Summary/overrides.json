@@ -1,0 +1,35 @@
+{
+  "voice": {
+    "voice": "zh-TW-YunJheNeural"
+  },
+  "slide_01": {
+    "narration": "這份簡報會用 Kaggle 五十家新創公司的資料，示範如何用 CRISP-DM 流程做特徵選擇。重點不是只追求最高分，而是理解哪些支出真的能解釋獲利。",
+    "layers": {
+      "slide_01_key_point_card_01.png": {
+        "hidden": true
+      },
+      "slide_01_illustration_01.png": {
+        "hidden": true,
+        "animation": "zoom-in",
+        "start": 7.24,
+        "duration": 0.7
+      },
+      "slide_01_title_01.png": {
+        "hidden": false,
+        "bbox": [
+          489,
+          179,
+          963,
+          255
+        ]
+      }
+    }
+  },
+  "slide_03": {
+    "layers": {
+      "slide_03_arrow_01.png": {
+        "hidden": true
+      }
+    }
+  }
+}

@@ -155,20 +155,45 @@ python "$SK/render_final_video.py"
 `build_composition.py` 會把它疊在 pristine metadata 上產生 `composition.json`。旁白/語音改了會連帶
 重跑 TTS + timeline（音檔/字幕跟著更新）；只改 layer 時間/動畫則只重建 composition（快）。
 
-### 可視化編輯介面（pipeline-ui）
-repo 根目錄有共用版 **pipeline-ui**，可瀏覽並編輯所有 task（讀 `task-index.json` + 各 task 的
-`composition.json`）。要編輯需開 server：
+### 預覽介面（pipeline-ui，preview-first）
+repo 根目錄的 **pipeline-ui** 是給最終使用者「預覽切圖、選配音/字幕」的瀏覽器（不是編輯器；演算法
+調校請見下面〈Editor mode〉）。讀 `task-index.json` + 各 task 的 `composition.json`：
 ```powershell
 # 在 repo 根目錄
 python pipeline_server.py 9001          # 預設 9001（8000-8099 在部分 Windows 機被保留擋掉）
 ```
-開 <http://localhost:9001/pipeline-ui/>：
-- 左：slide 列表　中：Composite 預覽（▶ Play 逐層動畫 + 同步字幕 + 語音）、資產分頁
-  （Original/Background/Debug/Gallery）、layer timing 軸　右：slide 數據、可編輯旁白 + 語音播放、layer 列表
-- **編輯**：點 layer → 改 start/duration/animation → Apply（即時更新）；改旁白 → Save narration（重跑 TTS）；
-  語音/語速 → Apply voice。全部寫進 `overrides.json`，套用後自動重載 composition（所見即所得）。
-- **MP4 export** 按鈕可直接從 UI 觸發 render。
-- 純檢視不需 server：`python -m http.server 9001` 後一樣能開（只是編輯/render 鈕無效）。
+開 <http://localhost:9001/>（會自動 302 → `/pipeline-ui/`）：
+- **左**：slide 列表
+- **中**：投影片預覽 + 預覽模式切換（`動畫預覽` / `切圖檢視`，後者用彩色 outline + 標 `數字 · type`）+ `▶ Play slide`（逐層動畫 + 同步字幕 + 語音）+ `Export MP4` 按鈕
+- **右**（4 個卡片）：
+  - **Slide** — 該頁基本資料（canvas、duration、layer 數、OCR 低 conf flag）
+  - **Narration** — 該頁旁白文字（可改、Save 後重跑 TTS）+ 內嵌 `<audio>` 預覽
+  - **Voice** — 語言下拉（zh-TW / zh-CN / en-US / ja-JP）→ 自動換 Voice 選項；語速 slider (-50%~+100%)；Apply voice (all slides)
+  - **Subtitle** — on/off、字型大小、字色、底色 + 即時預覽框；Apply subtitle style → 寫進 `caption_config.json`，下次 MP4 export 自動 pick up
+
+`/apply` 收的所有 payload（`{slide_XX: {narration}}`、`{voice: {...}}`、`{caption_style: {...}}`）都
+deep-merge 進 `overrides.json` / `caption_config.json`，然後重建 composition；只有 voice/旁白變動會
+重跑 TTS。
+
+### Editor mode（給演算法作者）
+所有切圖編輯能力（merge/hide/reorder、bbox 拖拉、cut-line 與雙 bbox split、OCR 校對、aspect ratio
+toggle、Undo ring buffer）的**後端全保留**，可以直接寫 `overrides.json` 觸發；只有 UI 把按鈕隱藏。
+詳細編輯 schema 見 [`WORK_REPORT.md`](WORK_REPORT.md) §8–§9。
+
+> 純檢視不需 server：`python -m http.server 9001` 一樣能開（只是配音/字幕 Apply 跟 render 無效）。
+
+### 真 HeyGen HyperFrames export（`export_hyperframes_html.py`）
+把 `composition.json` 變成 HF CLI 接受的 HTML composition + GSAP timeline + assets 專案：
+```powershell
+cd task=writing-os
+python ../skill-pptx-to-animated-video/scripts/export_hyperframes_html.py
+cd hyperframes-export
+npx hyperframes@0.6.93 lint       # 0 errors
+npx hyperframes@0.6.93 validate   # no console errors
+npx hyperframes@0.6.93 render -o out.mp4
+```
+output 是合格的 HF 專案（13 sub-comp + 79 assets，writing-os 上實測 → 19.7 MB MP4 / 6m 3s）。
+舊版 `export_hyperframes.py`（speculative JSON）保留作參考但已不用。
 
 ## 瀏覽器預覽（單 task draft）
 
@@ -210,7 +235,9 @@ skill-pptx-to-animated-video/
     ├── build_timeline.py      # 字幕分塊、SRT/VTT、hyperframes 預覽（讀 overrides）
     ├── build_composition.py   # 產生 composition.json（resolved 合約，套用 overrides）
     ├── validate_composition.py# 驗證 composition 忠實對應來源
-    └── render_final_video.py  # 讀 composition.json → letterbox 字幕燒錄
+    ├── render_final_video.py  # 讀 composition.json → letterbox 字幕燒錄
+    ├── export_hyperframes_html.py # composition.json → 真 HeyGen HF 專案（HTML+GSAP+assets）
+    └── export_hyperframes.py  # 舊 speculative JSON stub（保留作參考，不用）
 
 # repo 根目錄（跨 task 共用）
 pipeline-ui/                # composition-driven 可視化編輯介面（瀏覽全部 task）

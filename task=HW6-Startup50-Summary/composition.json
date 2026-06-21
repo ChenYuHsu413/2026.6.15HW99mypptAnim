@@ -39,11 +39,11 @@
       "layers": [
         {
           "id": "s01-title-01",
-          "image": "output/slide_01/slide_01_title_01.png",
+          "image": "output/slide_01/edits/slide_01_title_01.png",
           "type": "title",
           "bbox": [
-            479,
-            146,
+            489,
+            179,
             963,
             255
           ],
@@ -71,7 +71,8 @@
             "intensity": 1.0
           },
           "start": 3.84,
-          "duration": 0.7
+          "duration": 0.7,
+          "hidden": true
         },
         {
           "id": "s01-illustration-01",
@@ -89,7 +90,8 @@
             "intensity": 1.0
           },
           "start": 7.24,
-          "duration": 0.7
+          "duration": 0.7,
+          "hidden": true
         },
         {
           "id": "s01-illustration-02",
@@ -219,7 +221,8 @@
             "intensity": 1.0
           },
           "start": 1.75,
-          "duration": 0.7
+          "duration": 0.7,
+          "hidden": true
         },
         {
           "id": "s03-key-point-card-02",

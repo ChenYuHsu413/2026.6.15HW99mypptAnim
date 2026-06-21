@@ -47,7 +47,7 @@ button,input,select { font:inherit }
 .slide-btn strong { display:block; margin-bottom:3px }
 .slide-btn span { color:var(--muted); font-size:11px }
 
-.viewer { display:grid; grid-template-rows:auto auto 1fr auto auto; gap:10px; min-width:0 }
+.viewer { display:grid; grid-template-rows:auto auto 1fr auto auto; gap:10px; min-width:0; min-height:0 }
 .viewer-header { display:flex; align-items:center; justify-content:space-between; gap:12px }
 .viewer-actions { display:flex; align-items:center; gap:8px }
 .play-btn { border:1px solid var(--ok); border-radius:8px; padding:7px 12px; color:#0a1a0f; background:var(--ok); font-weight:700; font-size:12px; cursor:pointer; white-space:nowrap }
@@ -58,8 +58,15 @@ button,input,select { font:inherit }
 .asset-tabs { display:flex; gap:6px }
 .asset-tab { border:1px solid var(--line); border-radius:99px; padding:6px 10px; color:var(--muted); background:var(--panel2); cursor:pointer; font-size:12px }
 .asset-tab.active { color:#08111c; border-color:var(--accent); background:var(--accent) }
-.preview-card { display:grid; place-items:center; overflow:hidden; min-height:0; padding:10px }
-.stage-preview { position:relative; width:100%; aspect-ratio:16/9; overflow:hidden; border-radius:10px; background:#fff }
+.preview-card { display:flex; align-items:center; justify-content:center; overflow:hidden; min-height:0; padding:10px; container-type:size }
+.stage-preview {
+  position:relative;
+  aspect-ratio:16/9;
+  /* Fit inside the card: limit by container height OR width, whichever is tighter. */
+  width: min(100cqw, calc(100cqh * 16/9));
+  height: auto;
+  overflow:hidden; border-radius:10px; background:#fff;
+}
 .stage-preview img { position:absolute; user-select:none; pointer-events:none }
 .stage-preview .bg { inset:0; width:100%; height:100%; object-fit:contain }
 .stage-preview .layer { opacity:1; outline:1px solid rgba(125,211,252,.35) }
@@ -126,3 +133,83 @@ audio { width:100% }
 @keyframes dr { from { opacity:0; transform:translateY(10px) scale(.98) } to { opacity:1; transform:none } }
 
 @media(max-width:900px) { .app { grid-template-columns:1fr } }
+.layer-item { padding:10px 10px; }
+.layer-item + .layer-item { margin-top:6px; }
+.layer-item.multi-active { outline:2px solid var(--accent); }
+.layer-item.layer-hidden .layer-name, .layer-item.layer-hidden .layer-meta { opacity:0.5; text-decoration:line-through; }
+.layer-item .layer-meta { display:flex; flex-wrap:wrap; gap:4px 10px; }
+.layer-row-top { display:flex; align-items:center; gap:8px; }
+.layer-info { flex:1; min-width:0; }
+.layer-acts { display:flex; gap:6px; margin-top:8px; align-items:center; }
+.la-btn { background:transparent; color:var(--text); border:1px solid var(--line); border-radius:6px; min-width:34px; height:30px; padding:0 10px; font-size:14px; cursor:pointer; line-height:1; display:inline-flex; align-items:center; justify-content:center; }
+.la-btn:hover { background:var(--panel2); border-color:var(--accent2); }
+#segActions { display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:10px !important; }
+#segActions > span { width:100%; font-weight:600; font-size:12px; }
+#segActions .hf-btn { padding:8px 14px; font-size:13px; min-height:32px; }
+.layer-ocr { margin-top:4px; padding:3px 6px; border-radius:6px; background:rgba(125,211,252,.08); border:1px solid rgba(125,211,252,.18); color:var(--muted); font-size:11px; line-height:1.35; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+.layer-ocr.low { color:var(--text); background:rgba(251,113,133,.13); border-color:rgba(251,113,133,.55) }
+.layer-ocr.med { color:var(--text); background:rgba(250,204,21,.10); border-color:rgba(250,204,21,.45) }
+.layer-ocr[data-layer-ocr="1"] { cursor:pointer }
+.layer-ocr[data-layer-ocr="1"]:hover { filter:brightness(1.15) }
+.layer-ocr-conf { display:inline-block; min-width:30px; margin-right:4px; padding:0 4px; border-radius:4px; background:rgba(255,255,255,.08); color:var(--accent); font-weight:700 }
+.layer-ocr.low .layer-ocr-conf { color:var(--danger); background:rgba(251,113,133,.18) }
+.layer-ocr.med .layer-ocr-conf { color:var(--accent2); background:rgba(250,204,21,.18) }
+.layer-ocr-tag { color:var(--ok); margin-right:2px; font-weight:700 }
+.layer-item.low-conf { border-color:rgba(251,113,133,.55) }
+.layer-item.low-conf:hover, .layer-item.low-conf.active { border-color:var(--danger) }
+.layer-item.med-conf { border-color:rgba(250,204,21,.45) }
+.layer-item.med-conf:hover, .layer-item.med-conf.active { border-color:var(--accent2) }
+.aspect-pills { display:inline-flex; border:1px solid var(--line); border-radius:99px; background:var(--panel2); padding:2px; gap:2px }
+.aspect-pill { border:none; border-radius:99px; padding:5px 10px; color:var(--muted); background:transparent; font-size:11px; font-weight:700; cursor:pointer; min-width:36px }
+.aspect-pill:hover { color:var(--text) }
+.aspect-pill.active { color:#08111c; background:var(--accent) }
+.aspect-pill[disabled] { cursor:not-allowed; opacity:.6 }
+.ocr-modal-body { display:grid; gap:8px; margin-top:6px }
+.ocr-modal-body textarea { width:100%; min-height:140px; border:1px solid var(--line); border-radius:8px; padding:8px; color:var(--text); background:var(--panel2); font:inherit; font-size:13px; line-height:1.5; resize:vertical }
+.ocr-modal-meta { display:flex; gap:12px; font-size:11px; color:var(--muted); flex-wrap:wrap }
+.ocr-modal-actions { display:flex; gap:8px; margin-top:6px; flex-wrap:wrap }
+.ocr-modal-actions .reset-btn { background:transparent; color:var(--muted); border:1px solid var(--line); border-radius:8px; padding:7px 12px; font-size:12px; cursor:pointer }
+.ocr-modal-actions .reset-btn:hover { color:var(--danger); border-color:var(--danger) }
+
+/* ─── Preview-first UI additions ─────────────────────────────────── */
+.preview-mode-pills { display:inline-flex; border:1px solid var(--line); border-radius:99px; background:var(--panel2); padding:3px; gap:2px }
+.mode-pill { border:none; border-radius:99px; padding:6px 14px; color:var(--muted); background:transparent; font-size:12px; font-weight:600; cursor:pointer }
+.mode-pill:hover { color:var(--text) }
+.mode-pill.active { color:#08111c; background:var(--accent) }
+
+/* Voice picker grid */
+.voice-grid { display:grid; gap:10px; margin-bottom:10px }
+.voice-grid label { display:grid; gap:4px; font-size:11px; color:var(--muted) }
+.voice-grid select, .voice-grid input[type=range] { width:100%; padding:6px; background:var(--panel2); color:var(--text); border:1px solid var(--line); border-radius:6px; font:inherit; font-size:13px }
+.voice-grid input[type=range] { padding:0; height:22px }
+.rate-label { color:var(--accent); font-weight:700; font-size:12px; margin-left:6px }
+
+/* Subtitle controls */
+.subtitle-grid { display:grid; gap:10px; margin-bottom:10px }
+.subtitle-grid label { display:grid; grid-template-columns:auto 1fr auto; gap:8px; align-items:center; font-size:11px; color:var(--muted) }
+.subtitle-grid label > span:first-child { font-weight:600; color:var(--text) }
+.subtitle-grid .sub-help { font-size:10px; color:var(--muted); opacity:.7 }
+.subtitle-grid input[type=color] { width:46px; height:28px; padding:0; border:1px solid var(--line); border-radius:6px; background:var(--panel2); cursor:pointer }
+.subtitle-grid input[type=range] { width:100%; padding:0; height:22px }
+.sub-toggle { grid-template-columns:auto 1fr !important; cursor:pointer }
+.sub-toggle input { width:18px; height:18px; accent-color:var(--accent) }
+.sub-preview { margin-top:4px; padding:8px 14px; text-align:center; border-radius:6px; font-weight:600; min-height:38px }
+
+/* Segmentation-debug overlay */
+.layer.seg-shown { opacity:1 !important; animation:none !important; transform:none !important; }
+
+/* Hide editor-only scaffolding that may still render from old code paths */
+body.preview-mode #segActions,
+body.preview-mode .layer-acts,
+body.preview-mode #ocrDialog,
+body.preview-mode .layer-edit,
+body.preview-mode .notes-section,
+body.preview-mode .timeline-panel { display:none !important; }
+
+/* During playback the per-layer index badges are noise — hide them so only
+   the slide content + bottom caption remain visible. Outlines drawn by the
+   debug-mode also suppressed when playing. */
+.stage-preview.playing .layer-idx,
+.stage-preview.playing .seg-tag { display:none !important; }
+.stage-preview.playing .layer { outline:none !important; box-shadow:none !important; }
+

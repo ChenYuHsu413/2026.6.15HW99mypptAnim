@@ -51,6 +51,26 @@ stay pristine. Schema is keyed by slide:
 }
 ```
 
+Per-layer segmentation edits live in the same `layers` map:
+
+- `hidden: true` — drop the layer from the composition.
+- `merge_group: "g1"` — group members enter together; the primary (first by name)
+  donates start + animation.
+- `bbox: [x,y,w,h]` — reframe the layer; the server cuts a fresh transparent PNG
+  via `scripts/reextract.py` into `output/slide_##/edits/<name>` and
+  `build_composition.py` prefers that file when present.
+- `split` — two shapes, both emit two children that inherit timing /
+  z / animation / merge_group / hidden from the parent (children also pick
+  up their own overrides keyed by the synthetic child name, so split
+  children are first-class layers):
+    - `{ "axis": "x"|"y", "at": 0..1 }` — single cut into adjacent halves
+    - `{ "bboxes": [[x,y,w,h], [x,y,w,h]] }` — two explicit regions,
+      may be non-adjacent / overlap
+  Server re-extracts each child PNG into `edits/<child>.png`; when
+  center-attribution misses, also caches re-OCR in `edits/<stem>.ocr.json`.
+- `ocr_corrected: str|null` — human-verified OCR text; promoted into
+  composition.json's `layer.ocr` with `corrected: true` + `confidence: 1.0`.
+
 `tts_edge.py` speaks the effective narration (override text if present) with the
 voice override; `build_timeline.py` and `build_composition.py` apply overrides
 when building subtitles/timing and the resolved `composition.json`. A slide's
@@ -58,6 +78,101 @@ duration is re-probed from its current audio **only when that slide's narration
 or the voice changed** — so editing voice/text no longer requires re-running
 segmentation, and unedited slides stay byte-identical. (Needs ffprobe; without
 it, duration falls back to the baked value.)
+
+### Per-layer OCR evidence (`composition.json` layers[*].ocr)
+
+When `output/slide_##/slide_ocr.json` exists, `build_composition.py` attributes
+each line to the layer whose bbox contains the line's center, and attaches:
+
+```json
+"ocr": { "text": "full joined text", "confidence": 0.97, "line_count": 2 }
+```
+
+Layers with no attributed lines simply have no `ocr` field (composition stays
+byte-identical for decks where the OCR step never ran).
+
+**Split children** prefer a per-child OCR cache at
+`output/slide_##/edits/<child_stem>.ocr.json` when one exists; otherwise they
+fall back to slide-wide center-in-bbox aggregation. The server writes that
+cache only when center-attribution missed the child AND the parent had OCR —
+so the common case (cut through whitespace, both children pick up lines via
+center-in-bbox) pays nothing; the boundary case (a line straddles the cut) is
+recovered by lazy `RapidOCR` re-run on the child crop.
+
+**Manual corrections** live in `overrides.json` as
+`slide_XX.layers.<name>.ocr_corrected`: a string replaces the auto-OCR text
+and stamps `confidence = 1.0`, `corrected = true`; `null` (or an empty string,
+or a string identical to the auto-OCR text) removes the correction.
+
+UI affordances:
+- `confidence < 0.60` with attributed lines → **red** layer-row + ⚠ flag.
+- `type ∈ {text_block, key_point_card, annotation, table}` with `line_count == 0`
+  → **orange** layer-row + ◑ flag ("no OCR text · click to add").
+- ✎ badge marks a manually corrected layer.
+- Clicking any OCR row opens a modal with the full text, type/conf/lines/bbox
+  meta, a textarea, Save (writes `ocr_corrected`) and Reset (clears it).
+
+### HyperFrames templates (single source of truth)
+
+The draft-preview HTML/CSS/JS lives ONCE at
+`skill-pptx-to-animated-video/hyperframes/{index.html, styles.css, animation.js}`.
+`build_timeline.py` copies these three files verbatim into each task's
+`hyperframes/` on every build. Editing the skill copy fixes every deck on the
+next rebuild — no `task=*/hyperframes/animation.js` heredoc to keep in sync.
+
+The preview reads `composition.json` (one directory up from `hyperframes/`)
+directly, so it never drifts from the rendered MP4. No `project.json` is
+written; that older intermediate is gone.
+
+### Undo (`/undo`, `.overrides_history/`)
+
+Every `/apply` snapshots the prior `overrides.json` into
+`task=*/.overrides_history/NNNN.json` (ring buffer, cap 20) before the
+new edit lands. `/undo` pops the most recent snapshot, restores it as
+`overrides.json`, and rebuilds — re-running TTS + timeline only when
+narration/voice differ between snapshots. Notes-only payloads are exempt
+from snapshotting (they'd saturate the buffer on every keystroke).
+
+`/history-depth` is the depth check the UI calls on task switch to
+enable/disable the ↶ Undo button.
+
+### Forced-alignment (`align_subtitles.py`, optional)
+
+If `whisper-timestamped` is installed, the pipeline auto-rewrites
+`narration/subtitles.{srt,vtt}` with timings snapped to word boundaries
+detected from the actual MP3 audio. Strict char-by-char matching against
+the cue text; when coverage drops below 40% (homophones / punctuation
+divergence), falls back to time-proportional distribution over the
+detected speech range. When `whisper-timestamped` is NOT installed, the
+script prints a friendly message and returns 0 — the pre-existing
+char-proportional SRT stays in place. `pip install whisper-timestamped`
+to enable.
+
+### HyperFrames adapter (`export_hyperframes.py`, speculative)
+
+Reads `composition.json` and writes `hyperframes/project.hf.json` with a
+best-effort guess at the HyperFrames project shape. The field map at the
+top of the script (`_HF_FIELD_MAP`, `_HF_ANIM_NAMES`) is a placeholder —
+you must verify against an actual HF export before importing. The output
+carries a `_speculative` marker until that's done.
+
+### Aspect ratio toggle (`/aspect`)
+
+The UI exposes three pills — `16:9 / 9:16 / 1:1` — that rebuild a task at a
+new canvas size. The server's `set_aspect(task_dir, aspect)` writes the new
+`{aspect, width, height}` into the task's `project_config.json`, then wipes
+artifacts that carry pixel coordinates (`output/slide_*/`, `overrides.json`,
+`composition.json`, `narration/narration_timing.json`) and runs render →
+ocr → segment → timeline → composition. **TTS is skipped** — audio is
+aspect-agnostic, so the existing MP3s under `audio/` are reused.
+
+Layer edits (split / bbox / merge / hide / OCR corrections) **are reset** —
+their coordinates only make sense at the original aspect. The UI shows a
+confirmation warning before triggering. Presets: 16:9 = 1920×1080, 9:16 =
+1080×1920, 1:1 = 1080×1080. The render uses `min(W/page.w, H/page.h)` to
+fit-inside-pad-white, so changing aspect on a deck designed for the
+original ratio will produce visible letterbox; smart reflow is out of
+scope.
 
 ## Workflow
 

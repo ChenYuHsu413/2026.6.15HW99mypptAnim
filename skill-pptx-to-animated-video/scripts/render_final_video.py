@@ -86,7 +86,7 @@ def load_slides():
         bg = cv2.cvtColor(np.array(Image.open(ROOT / s["background"]).convert("RGB")), cv2.COLOR_RGB2BGR)
         layers = []
         for l in s["layers"]:
-            if l["type"] == "key_point_card":
+            if l["type"] == "key_point_card" or l.get("hidden"):
                 continue
             rgba = np.array(Image.open(ROOT / l["image"]).convert("RGBA"))
             bgr = cv2.cvtColor(rgba[:, :, :3], cv2.COLOR_RGB2BGR)

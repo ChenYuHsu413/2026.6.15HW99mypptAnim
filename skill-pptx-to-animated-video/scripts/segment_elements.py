@@ -1100,6 +1100,10 @@ def segment_slide(slide_num, debug=True):
     # Humans read the main title first, wherever the band sort put it.
     entries.sort(key=lambda e: 0 if e["type"] == "title" else 1)
 
+    # Record each entry's index post-sort so annotation layers can persist
+    # their parent's position; build_timeline.py uses it to recompute starts
+    # from the live audio duration without re-running segmentation.
+    entry_idx = {id(e): i for i, e in enumerate(entries)}
     background = img.copy()
     layers = []
     counts = {}
@@ -1140,21 +1144,23 @@ def segment_slide(slide_num, debug=True):
         else:
             start = round(min(0.45 + i * cue_gap, duration - 1.0), 2)
         item["_start"] = start
-        layers.append(
-            {
-                "name": filename,
-                "type": layer_type,
-                "x": int(x),
-                "y": int(y),
-                "width": int(w),
-                "height": int(h),
-                "z_index": 5 + i,
-                "animation": ANIMATION.get(layer_type, "fade-in"),
-                "start": start,
-                "duration": 0.7,
-                "narration_cue": cue_text,
-            }
-        )
+        layer_entry = {
+            "name": filename,
+            "type": layer_type,
+            "x": int(x),
+            "y": int(y),
+            "width": int(w),
+            "height": int(h),
+            "z_index": 5 + i,
+            "animation": ANIMATION.get(layer_type, "fade-in"),
+            "start": start,
+            "duration": 0.7,
+            "narration_cue": cue_text,
+            "entry_index": i,
+        }
+        if layer_type == "annotation" and item.get("parent") is not None:
+            layer_entry["parent_index"] = entry_idx.get(id(item["parent"]))
+        layers.append(layer_entry)
     Image.fromarray(background).save(slide_dir / "background.png")
     metadata = {
         "slide": slide_num,

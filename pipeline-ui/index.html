@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Pipeline Inspector</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=9">
 </head>
-<body>
+<body class="preview-mode">
   <header class="topbar">
     <div>
       <p class="eyebrow">Composition pipeline inspector</p>
@@ -14,6 +14,7 @@
     </div>
     <div class="topbar-actions">
       <label class="tsel"><span>Task</span><select id="taskSelect"></select></label>
+      <button id="uploadBtn" class="hf-btn">Upload deck</button>
       <label class="tsel"><span>Theme</span><select id="themeSelect">
         <option value="dark">Dark</option><option value="light">Light</option>
         <option value="slate">Slate</option><option value="warm">Warm</option>
@@ -35,14 +36,16 @@
           <h2 id="slideTitle">Select a slide</h2>
         </div>
         <div class="viewer-actions">
+          <div class="preview-mode-pills" id="previewModePills" title="切換預覽模式">
+            <button class="mode-pill active" data-mode="animation" title="顯示 layer 帶進場動畫（按 ▶ Play slide 才真的播放）">動畫預覽</button>
+            <button class="mode-pill" data-mode="debug" title="所有 layer 全顯示 + 彩色 outline + 標 type／編號，review 切圖用">切圖檢視</button>
+          </div>
           <button id="playBtn" class="play-btn">▶ Play slide</button>
-          <button id="hfBtn" class="hf-btn">Open in HyperFrames</button>
-          <button id="renderBtn" class="render-btn">MP4 export</button>
-          <label class="switch"><input type="checkbox" id="showSkipped"><span>Show skipped</span></label>
+          <button id="renderBtn" class="render-btn">Export MP4</button>
         </div>
       </div>
 
-      <div class="asset-tabs">
+      <div class="asset-tabs" id="assetTabs">
         <button class="asset-tab active" data-view="composite">Composite</button>
         <button class="asset-tab" data-view="original">Original</button>
         <button class="asset-tab" data-view="background">Background</button>
@@ -67,41 +70,71 @@
 
     <aside class="inspector">
       <section class="card">
-        <div class="panel-title">Slide data</div>
+        <div class="panel-title">Slide</div>
         <dl id="stats" class="stats"></dl>
       </section>
+
       <section class="card">
         <div class="panel-title">Narration</div>
         <textarea id="narration" class="narration-edit" placeholder="Slide narration…"></textarea>
         <div class="edit-row"><button id="saveNarration" class="hf-btn">Save narration (re-TTS)</button></div>
         <audio id="audio" controls></audio>
-        <div class="edit-row voice-row">
-          <select id="voiceSel">
-            <option value="zh-TW-HsiaoChenNeural">HsiaoChen (female)</option>
-            <option value="zh-TW-YunJheNeural">YunJhe (male)</option>
-            <option value="zh-TW-HsiaoYuNeural">HsiaoYu (female)</option>
-          </select>
-          <input id="rateInp" placeholder="rate e.g. -8%">
-          <button id="voiceApply" class="hf-btn">Apply voice (all)</button>
-        </div>
       </section>
-      <section class="card layers-card">
-        <div class="panel-title">Layers</div>
-        <div id="layerEdit" class="layer-edit" hidden>
-          <div class="layer-edit-name" id="leName"></div>
-          <div class="layer-edit-fields">
-            <label>start<input id="leStart" type="number" step="0.05" min="0"></label>
-            <label>dur<input id="leDur" type="number" step="0.05" min="0.1"></label>
-            <label>anim<select id="leAnim">
-              <option>fade-in-down</option><option>fade-in-up</option><option>fade-in</option>
-              <option>pop-in</option><option>zoom-in</option><option>wipe-in</option><option>draw-in</option>
-            </select></label>
-            <button id="leApply" class="hf-btn">Apply</button>
-          </div>
+
+      <section class="card">
+        <div class="panel-title">Voice</div>
+        <div class="voice-grid">
+          <label>Language
+            <select id="voiceLang">
+              <option value="zh-TW">繁體中文 (zh-TW)</option>
+              <option value="zh-CN">简体中文 (zh-CN)</option>
+              <option value="en-US">English (en-US)</option>
+              <option value="ja-JP">日本語 (ja-JP)</option>
+            </select>
+          </label>
+          <label>Voice
+            <select id="voiceSel"></select>
+          </label>
+          <label>Speed <span id="rateLabel" class="rate-label">+38%</span>
+            <input id="rateSlider" type="range" min="-50" max="100" value="38" step="1">
+          </label>
         </div>
-        <div id="layerList" class="layer-list"></div>
+        <div class="edit-row"><button id="voiceApply" class="hf-btn">Apply voice (all slides)</button></div>
+      </section>
+
+      <section class="card">
+        <div class="panel-title">Subtitle</div>
+        <div class="subtitle-grid">
+          <label class="sub-toggle"><input type="checkbox" id="subOn" checked><span>Burned subtitles in MP4</span></label>
+          <label>Size <span id="subSizeLabel" class="rate-label">11</span>
+            <input id="subSize" type="range" min="8" max="32" step="1" value="11">
+          </label>
+          <label>Text color
+            <input id="subFg" type="color" value="#ffffff">
+          </label>
+          <label>Background
+            <input id="subBg" type="color" value="#000000">
+            <span class="sub-help">opacity 40% baked</span>
+          </label>
+          <div class="sub-preview" id="subPreview">字幕預覽 · subtitle preview</div>
+        </div>
+        <div class="edit-row"><button id="subApply" class="hf-btn">Apply subtitle style</button></div>
       </section>
     </aside>
+
+    <div id="uploadDialog" class="dialog" hidden>
+      <div class="dialog-card">
+        <h3>Upload deck</h3>
+        <p class="eyebrow">.pptx is auto-converted to PDF via LibreOffice (soffice). .pdf is stored as-is.</p>
+        <label>Task name <input id="upTaskName" placeholder="MyDeckName" style="width:200px"></label>
+        <div style="margin-top:8px"><input id="upFile" type="file" accept=".pptx,.ppt,.pdf"></div>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button id="upGo" class="play-btn">Upload</button>
+          <button id="upClose" class="hf-btn">Cancel</button>
+        </div>
+        <pre id="upLog" style="margin-top:10px;font-size:11px;color:var(--ok);white-space:pre-wrap;max-height:180px;overflow:auto"></pre>
+      </div>
+    </div>
 
     <div id="renderDialog" class="dialog" hidden>
       <div class="dialog-card">
@@ -118,6 +151,6 @@
     </div>
   </main>
 
-  <script src="app.js?v=1"></script>
+  <script src="app.js?v=14"></script>
 </body>
 </html>

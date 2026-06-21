@@ -210,9 +210,9 @@ schema 再做對應。**建議先不要**，先把自有渲染器的中間格式
 4. ✅ **給每個 segment 穩定 `id`**，override 改用 id 綁定。（已完成，於 composition.json 推導）
 
 **建議補功能：**
-5. ⬜ **OCR**（最大缺口）：補 `ocr_text` → 解鎖真 AI storyboard、文字編輯、可靠 type 分類。
-6. ⬜ **confidence 分數** → UI 標紅可疑切塊。
-7. 🟡 **UI 上的切圖修正**（合併/拆分/調 bbox）。（部分：時間/動畫/旁白/語音已可編；切圖本身尚不可改）
+5. ✅ **OCR**（最大缺口，session 5 完成）：`ocr_slides.py` per-slide 完成；per-layer 仍未做。
+6. ✅ **confidence 分數**（session 5 完成）：每張 slide / 每行都有 confidence；UI「標紅可疑切塊」仍未做。
+7. 🟢 **UI 上的切圖修正**（session 5 大幅推進）：時間/動畫/旁白/語音 + v1（合併/隱藏/重排）+ v2（bbox 拖拉）都已可在 UI 內完成。v3（拆分）尚未做。
 
 **可保留 / 不要動：**
 - `segment_elements.py` 的偵測核心、0px 驗證、debug 可視化、draft 預覽器、letterbox 字幕。
@@ -227,7 +227,7 @@ schema 再做對應。**建議先不要**，先把自有渲染器的中間格式
 
 ## 8. 建議開發優先順序
 
-> 進度圖例：✅ 完成　🟡 部分完成　⬜ 未做。最後更新：2026-06-18（session 4）。
+> 進度圖例：✅ 完成　🟢 大幅推進　🟡 部分完成　⬜ 未做。最後更新：2026-06-20（session 5）。
 
 ```
 P0（地基，不做後面都會返工）
@@ -243,13 +243,22 @@ P1（解開順序耦合，讓 UI 流程能照順序跑）
   ⬜ 6. aspect ratio 設計成「重跑 pipeline 參數」（canvas 已進 config，但改它還不會重切/重渲）
 
 P2（解鎖智慧編輯）
-  ⬜ 7. 加 OCR → ocr_text + confidence
-  🟡 8. UI 編輯寫進 overrides：start/duration/animation/旁白/語音 已可編（pipeline-ui 直接編輯
-        控制項，所見即所得）。但「切圖修正」（合併/拆分/調 bbox）尚未做。
+  ✅ 7. OCR + confidence（session 5 完成）：`ocr_slides.py` 使用 RapidOCR 3.x + CHINESE_CHT，
+        每張 slide 寫 `output/slide_##/slide_ocr.json`，conf ~0.95。Per-layer OCR 仍未做，
+        留待解鎖「標紅可疑切塊」UI 時做。
+  🟢 8. UI 編輯寫進 overrides（session 5 大幅推進）：
+        - start/duration/animation/旁白/語音 已可編（session 4）
+        - v1 合併（merge_group）+ 隱藏（hidden）+ z-index 重排 ✅
+        - v2 bbox 拖拉，server 自動從 original−background reextract 新 PNG ✅
+        - v3 拆分（split）⬜ 還沒做
 
 P3（打磨）
-  ⬜ 9. 字幕 forced-alignment、PPTX 直通、HyperFrames 接口
-  ⬜ 10. 收斂 3 份 script 副本到單一 skill
+  ⬜ 9a. 字幕 forced-alignment（whisper-timestamped 取代字數比例分配）
+  ✅ 9b. PPTX 直通（session 5 完成）：UI 接受 .pptx、`/ingest` 解 multipart、後端透過
+        LibreOffice headless 轉 PDF。`render_slides.py` 仍只認 PDF（依第 11.5 節原則）。
+  ⬜ 9c. HyperFrames 接口
+  ⬜ 10. 收斂 3 份 `task=*/scripts/` 副本到單一 skill；4 份 `task=*/hyperframes/animation.js`
+        也有漂移（session 5 只在 task=test 加了 hidden flag 支援），一併處理。
 ```
 
 ### 另外完成（原 P 清單沒列，但 session 4 做掉的架構鍵石）

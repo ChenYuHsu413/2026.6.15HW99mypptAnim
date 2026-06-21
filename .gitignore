@@ -7,3 +7,11 @@ __pycache__/
 **/final/narration_full.mp3
 **/final/video_concat_list.txt
 .npm-cache/
+
+# HF (HeyGen HyperFrames) export output (~40MB incl. assets + MP4); regenerated
+# by `python ../skill-pptx-to-animated-video/scripts/export_hyperframes_html.py`
+**/hyperframes-export/
+
+# Debug screenshots saved while probing the UI
+/_ui_shot.png
+/_play_shot.png

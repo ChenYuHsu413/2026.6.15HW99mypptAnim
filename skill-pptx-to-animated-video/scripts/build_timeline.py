@@ -2,7 +2,13 @@
 metadata.json (written by segment_elements.py) and narration_script.md.
 
 Writes: narration/narration_timing.json, subtitles.srt, subtitles.vtt,
-hyperframes/{project.json,index.html,styles.css,animation.js}.
+hyperframes/{index.html,styles.css,animation.js}.
+
+The hyperframes draft preview reads composition.json directly (built by
+build_composition.py), so the three static template files are not generated
+here — they're copied verbatim from the skill's canonical
+`skill-pptx-to-animated-video/hyperframes/` directory. Edit those templates
+once and every task picks up the change on the next build.
 
 Run AFTER segment_elements.py, and re-run whenever audio or layers change.
 """
@@ -10,6 +16,7 @@ Run AFTER segment_elements.py, and re-run whenever audio or layers change.
 import json
 import math
 import re
+import shutil
 from pathlib import Path
 
 import config
@@ -21,6 +28,7 @@ OUT = ROOT / "output"
 AUDIO = ROOT / "audio"
 NARRATION = ROOT / "narration"
 HYPER = ROOT / "hyperframes"
+HYPER_TEMPLATES = Path(__file__).resolve().parent.parent / "hyperframes"
 WIDTH = config.PROJECT["canvas"]["width"]
 HEIGHT = config.PROJECT["canvas"]["height"]
 FPS = config.PROJECT["canvas"]["fps"]
@@ -85,6 +93,37 @@ def chunk_narration(text, max_chars=SUB_CHUNK_MAX):
     return chunks
 
 
+def recompute_layer_starts(layers, duration):
+    """Return {layer_name: start} computed from the *current* slide duration.
+
+    Mirrors the formula segment_elements.py originally baked into metadata:
+        cue_gap   = max(0.55, (duration - 2.2) / N_entries)
+        baseline  = round(min(0.45 + i * cue_gap, duration - 1.0), 2)
+        annotation -> round(min(parent_baseline + 0.85, duration - 0.8), 2)
+
+    Works without re-segmenting: each layer carries its entry_index, and
+    annotation layers carry parent_index. Layers from older deck builds (no
+    entry_index) fall back to their baked metadata `start` — preserving
+    byte-identical output for tasks frozen at an earlier pipeline version.
+    """
+    if not layers:
+        return {}
+    if not all("entry_index" in l for l in layers):
+        return {l["name"]: l["start"] for l in layers}
+    n = max((l["entry_index"] for l in layers), default=0) + 1
+    cue_gap = max(0.55, (duration - 2.2) / max(1, n))
+    baselines = {}
+    for l in layers:
+        baselines[l["entry_index"]] = round(min(0.45 + l["entry_index"] * cue_gap, duration - 1.0), 2)
+    starts = {}
+    for l in layers:
+        if l["type"] == "annotation" and l.get("parent_index") in baselines:
+            starts[l["name"]] = round(min(baselines[l["parent_index"]] + 0.85, duration - 0.8), 2)
+        else:
+            starts[l["name"]] = baselines[l["entry_index"]]
+    return starts
+
+
 def main():
     scripts = parse_script()
     metadatas = load_metadatas()
@@ -106,14 +145,16 @@ def main():
         duration = media.slide_duration(audio_path, meta["duration"]) if refresh else meta["duration"]
         start = round(cursor, 2)
         end = round(cursor + duration, 2)
+        layer_starts = recompute_layer_starts(meta["layers"], duration)
         timing[key] = {
             "voiceover_file": f"audio/slide_{n:02d}_voiceover.mp3",
             "start": start,
             "end": end,
             "script": script,
+            "layer_starts": layer_starts,
             "cues": [
                 {
-                    "time": round(start + l["start"], 2),
+                    "time": round(start + layer_starts[l["name"]], 2),
                     "layer": l["name"],
                     "action": l["animation"],
                     "spoken_content": l["narration_cue"],
@@ -152,136 +193,21 @@ def main():
     )
     (NARRATION / "subtitles.srt").write_text("\n".join(srt), encoding="utf-8")
     (NARRATION / "subtitles.vtt").write_text("\n".join(vtt), encoding="utf-8")
-    write_hyperframes(metadatas, timing)
+    copy_hyperframes_templates()
     print(f"timeline: {sum(len(m['layers']) for m in metadatas)} layers, ends {max(t['end'] for t in timing.values())}s")
 
 
-def write_hyperframes(metadatas, timing):
+def copy_hyperframes_templates():
+    """Drop the three static draft-preview files into the task's hyperframes/.
+
+    The templates live in the skill's `hyperframes/` directory and are the
+    single source of truth; every task gets a verbatim byte copy on each
+    build, so editing the skill copy fixes every deck on the next rebuild.
+    No `project.json` is written — the preview reads composition.json directly.
+    """
     HYPER.mkdir(exist_ok=True)
-    (HYPER / "project.json").write_text(
-        json.dumps(
-            {"width": WIDTH, "height": HEIGHT, "fps": FPS, "slides": metadatas, "timing": timing},
-            ensure_ascii=False, indent=2,
-        ),
-        encoding="utf-8",
-    )
-    (HYPER / "index.html").write_text(
-        """<!doctype html>
-<html lang="zh-Hant">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HyperFrames Preview</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <main id="stage" aria-label="video preview">
-    <div id="slide"></div>
-    <div id="caption"></div>
-  </main>
-  <div id="controls">
-    <button id="play">Play</button>
-    <button id="subtitles">Subtitles On</button>
-  </div>
-  <script src="animation.js"></script>
-</body>
-</html>
-""",
-        encoding="utf-8",
-    )
-    (HYPER / "styles.css").write_text(
-        """html, body { margin: 0; min-height: 100%; background: #202124; font-family: Arial, "Noto Sans TC", sans-serif; }
-#stage { position: relative; width: min(100vw, calc(100vh * 16 / 9)); aspect-ratio: 16 / 9; margin: 0 auto; overflow: hidden; background: white; }
-#slide, .bg, .layer { position: absolute; inset: 0; }
-.bg, .layer { width: 100%; height: 100%; object-fit: contain; user-select: none; pointer-events: none; }
-.layer { inset: auto; opacity: 0; transform-origin: center; }
-.show.fade-in-down { animation: fadeDown var(--dur) ease forwards; }
-.show.fade-in-up { animation: fadeUp var(--dur) ease forwards; }
-.show.fade-in { animation: fade var(--dur) ease forwards; }
-.show.pop-in { animation: pop var(--dur) cubic-bezier(.2,.85,.25,1.2) forwards; }
-.show.zoom-in { animation: zoom var(--dur) ease forwards; }
-.show.wipe-in { animation: wipe var(--dur) ease forwards; }
-.show.draw-in { animation: draw var(--dur) ease forwards; }
-#caption { position: absolute; left: 8%; right: 8%; bottom: 4%; min-height: 48px; padding: 10px 16px; display: none; align-items: center; justify-content: center; text-align: center; color: #fff; background: rgba(0,0,0,.58); font-size: 28px; line-height: 1.35; }
-#caption.on { display: flex; }
-#controls { position: fixed; left: 16px; bottom: 16px; display: flex; gap: 8px; }
-button { border: 0; border-radius: 6px; padding: 10px 14px; background: #f6f7f8; cursor: pointer; }
-@keyframes fadeDown { from { opacity: 0; transform: translateY(-22px); } to { opacity: 1; transform: none; } }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
-@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
-@keyframes pop { from { opacity: 0; transform: scale(.86); } to { opacity: 1; transform: scale(1); } }
-@keyframes zoom { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: scale(1); } }
-@keyframes wipe { from { opacity: 0; clip-path: inset(0 100% 0 0); } to { opacity: 1; clip-path: inset(0); } }
-@keyframes draw { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: none; } }
-""",
-        encoding="utf-8",
-    )
-    (HYPER / "animation.js").write_text(
-        """// Draft preview -- reads the same composition.json the renderer consumes,
-// so the preview can't drift from the final MP4.
-const slideRoot = document.getElementById('slide');
-const caption = document.getElementById('caption');
-const playButton = document.getElementById('play');
-const subtitleButton = document.getElementById('subtitles');
-let subtitlesOn = true;
-
-subtitleButton.addEventListener('click', () => {
-  subtitlesOn = !subtitlesOn;
-  subtitleButton.textContent = subtitlesOn ? 'Subtitles On' : 'Subtitles Off';
-  caption.classList.toggle('on', subtitlesOn);
-});
-
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-async function loadComposition() {
-  const res = await fetch('../composition.json');
-  if (!res.ok) throw new Error(res.status);
-  return res.json();
-}
-
-function showSlide(comp, slide) {
-  slideRoot.innerHTML = '';
-  const base = document.createElement('img');
-  base.className = 'bg';
-  base.src = `../${slide.background}`;
-  slideRoot.appendChild(base);
-  for (const layer of slide.layers) {
-    if (layer.type === 'key_point_card') continue;  // matches the renderer
-    const img = document.createElement('img');
-    img.className = `layer ${layer.enter.type}`;
-    img.src = `../${layer.image}`;
-    img.style.left = `${layer.bbox[0] / comp.canvas.width * 100}%`;
-    img.style.top = `${layer.bbox[1] / comp.canvas.height * 100}%`;
-    img.style.width = `${layer.bbox[2] / comp.canvas.width * 100}%`;
-    img.style.height = `${layer.bbox[3] / comp.canvas.height * 100}%`;
-    img.style.zIndex = layer.z;
-    img.style.setProperty('--dur', `${layer.duration}s`);
-    slideRoot.appendChild(img);
-    window.setTimeout(() => img.classList.add('show'), layer.start * 1000);
-  }
-  caption.textContent = slide.narration;
-  caption.classList.toggle('on', subtitlesOn);
-}
-
-async function play() {
-  playButton.disabled = true;
-  const comp = await loadComposition();
-  for (const slide of comp.slides) {
-    showSlide(comp, slide);
-    const audio = new Audio(`../${slide.audio}`);
-    try { await audio.play(); } catch (e) {}
-    await sleep(slide.duration * 1000 + 500);
-  }
-  playButton.disabled = false;
-}
-
-playButton.addEventListener('click', play);
-loadComposition()
-  .then(c => showSlide(c, c.slides[0]))
-  .catch(() => { caption.textContent = 'composition.json not found -- run build_composition.py'; caption.classList.add('on'); });
-""",
-        encoding="utf-8",
-    )
+    for name in ("index.html", "styles.css", "animation.js"):
+        shutil.copyfile(HYPER_TEMPLATES / name, HYPER / name)
 
 
 if __name__ == "__main__":

@@ -14,5 +14,9 @@
   {
     "path": "task=InfoGraphic2AIGCdirection",
     "label": "InfoGraphic2AIGCdirection"
+  },
+  {
+    "path": "task=test",
+    "label": "test"
   }
 ]
