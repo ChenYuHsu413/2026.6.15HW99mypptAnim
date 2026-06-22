@@ -888,7 +888,60 @@ if isinstance(incoming.get("caption_style"), dict):
 
 ---
 
-## 13. 舊版第 9 點（保留作參考）
+## 13. Session 9 — 切圖通用化(broken-border 卡片)+ audio 時長 bug 修復(2026-06-22 續)
+
+延續 SESSION_HANDOFF 的 testtt 待辦「Slide 2 箭頭變大」。使用者點出原則問題:
+**不該凡事 override**——別的投影片遇到一樣問題還是會壞;且 skill 初衷已寫明
+優先改演算法。於是改用通用修法。
+
+### 13.1 根因(用量測,不是猜)
+- testtt slide 2 的 Marketing Spend 卡只剩中間「Spend」字殘留成 arrow,卡片
+  邊框 + 「Marketing」字併進了背景(機器/漏斗那塊大 blob)。
+- 實測 `detect_cards`:這張卡的洞**有**被找到,尺寸/矩形度/內部 ink 全過,
+  唯獨卡在 `border_ring_fraction`——右邊框緊貼漏斗、手繪線斷裂只有 **0.54**,
+  低於四邊取最小值的 0.85 門檻 → 被當 phantom hole 丟棄。
+
+### 13.2 通用修法(`segment_elements.py`)
+1. `border_ring_fraction` 拆出 `border_ring_sides()`(回傳四邊),新增
+   `has_card_border()`:放寬成「最強三邊 ≥0.85 且最弱邊 ≥0.50」,容許一邊被
+   相鄰圖形蓋斷的真卡片。
+2. 這類「弱邊卡」**不參與 `card_adjacent` 串接**,且**與強卡重疊就丟棄**——
+   避免弱邊洞把兩張真卡橋接成 blob。
+3. 全程在 `RING_RELAX`(env `SEG_RING_RELAX`,預設開)toggle 後面。
+
+### 13.3 隔離回歸(跨 5 deck / 67 slide)
+- 寫 harness 比對 baseline(toggle off)vs relaxed 的 `detect_cards` 輸出。
+- 第一版(只放寬 gate):改 9 張,**testtt s6 把 Model D/E 三卡串成 blob**(回歸)。
+  關鍵發現:s6 假洞最弱邊 0.67 **反而 > 真卡 0.54**,證明單靠邊框強度無法分。
+- 加上「弱卡不串接 + 與強卡重疊就丟」後:**8 張 slide 救回漏卡、零回歸**
+  (testtt s2/s7/s8、HW6 s7/s8/s18、InfoGraphic s3/s6),且 toggle off 時與
+  原始嚴格行為**位元級相同**。移除了 testtt s2 原本暫加的 `merge` override。
+
+### 13.4 連帶修掉的 pre-existing bug:audio 時長
+- 重切整個 testtt 後,composition 每張 slide 都是 **6.55s**(預設值)。
+- 根因:`find_ffprobe`(`media.py` + `segment_elements.py`)只找
+  `cwd/node_modules`,但 cwd 是 task dir、`node_modules` 在**上一層專案根**,
+  所以 ffprobe 永遠找不到 → `audio_duration` 全部 fallback。從沒 render 過
+  所以沒被發現。
+- 修法:兩處 `find_ffprobe` 改成往 `cwd` 及所有上層目錄找(對齊
+  `render_final_video.py` 既有寫法)。
+- 修後時長正確反映真實旁白(21–33s/張),總長 **77s → 299s**。沒這修,
+  render 出來每張音檔都會被截到 6.5 秒。
+
+### 13.5 交付狀態
+- 重切整個 testtt(11 slides)+ rebuild timeline/composition,
+  `validate_composition.py` = OK: 11 slides, 88 layers, all faithful。
+- 改動檔:`skill-.../segment_elements.py`、`skill-.../media.py`、
+  `task=testtt/seg_overrides.json`(移除 s2 override);testtt output/ +
+  composition.json 重生成。
+- 文件:全域 `~/.claude/CLAUDE.md` 加「5. Generalize, Don't Patch」原則;
+  SKILL.md override 段補回歸掃描紀律 + broken-border 範例;USER_MANUAL §14。
+- **仍未 render MP4**(下一步)。workstream A(旁白驅動 timing)未動:s2 現在
+  多了 Marketing/State 兩卡,進場仍按 index 平均分配。
+
+---
+
+## 14. 舊版第 9 點（保留作參考）
 
 ### 9.1 最自然的延續 — 切圖編輯 v3：Split
 - 用途：「這一塊應該切成兩塊」。

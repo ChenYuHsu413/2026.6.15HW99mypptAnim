@@ -320,6 +320,22 @@ is a *segmentation-time* file, distinct from the post-segmentation
 split or reshape them. **Prefer fixing the algorithm over adding an override**;
 add one only when generalizing the pattern would mis-fire on other decks.
 
+**Don't *assume* it would mis-fire — measure.** Before reaching for an override,
+find the real root cause (instrument `detect_cards`/`detect_elements`, print the
+failing gate), then run the candidate general fix as a regression sweep across
+every deck's `output/slide_*/original.png` and diff the detected layers. Ship the
+algorithm change only if it helps (or is neutral) everywhere; fall back to an
+override only when the signal genuinely can't separate the cases — and record the
+number that proves it. Gate shared-logic changes behind an env toggle so the old
+path stays bit-identical when off (e.g. `SEG_RING_RELAX`).
+
+*Built-in example:* a card whose hand-drawn border is broken on **one** side
+where a neighbouring drawing (arrow head, funnel) snaps it is now recovered
+automatically — `has_card_border` accepts three strong sides + one broken-but-
+present side, and such "weak" cards are kept out of the card-chaining pass and
+dropped if they overlap a strong card, so a broken border can't bridge two real
+cards into a blob. This replaced what would have been a per-deck `merge` override.
+
 Each slide entry may contain:
 - `merge`: `{box, ...}` list — collapse pieces in the region into one layer.
   Flags: `tight` (carve from raw ink, ignore absorbed bboxes — splits a welded

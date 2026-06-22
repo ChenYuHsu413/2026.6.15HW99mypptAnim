@@ -371,6 +371,15 @@ UI 寫不到的細節可以直接編 `task=*/overrides.json`。schema：
 - `project_config.json` — canvas / render 參數
 - `voice_config.json` — voice 預設
 - `caption_config.json` — 字幕字型 / 顏色 / margin / chunk_max_chars
+- `seg_overrides.json` — 切圖時的 per-slide 覆蓋(`merge`/`suppress`/`order`/
+  `irregular`),keyed by slide 號碼。**只在通用演算法會誤判別的 deck 時才用**;
+  優先改演算法,並用「跨 deck 回歸掃描」驗證(見 SKILL.md「overrides vs
+  algorithm changes」)。
+
+> **卡片邊框斷裂會自動救回**:一張卡若有 *一邊* 邊框被相鄰圖形(箭頭、漏斗)
+> 蓋斷,以往會整張掉進背景;現在 `segment_elements.py` 會自動把它當卡片救回
+> (其餘三邊完整即可),不需要 per-task override。可用 `SEG_RING_RELAX=0` 關閉
+> 回到舊的嚴格行為。
 
 ---
 

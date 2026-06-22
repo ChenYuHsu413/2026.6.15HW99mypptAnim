@@ -14,9 +14,16 @@ SLIDE_TAIL = 0.55  # silence pad after speech; matches segment_elements
 
 
 def find_ffprobe():
-    local = Path.cwd() / "node_modules" / "ffprobe-static" / "bin" / "win32" / "x64" / "ffprobe.exe"
-    if local.exists():
-        return str(local)
+    # Steps run with cwd=task dir, but node_modules sits at the project root one
+    # level up, so check the task dir AND its ancestors -- otherwise the probe
+    # is never found and every slide silently falls back to the placeholder
+    # duration (6.55s) instead of its real narration length.
+    rel = Path("node_modules") / "ffprobe-static" / "bin" / "win32" / "x64" / "ffprobe.exe"
+    here = Path.cwd()
+    for base in (here, *here.parents):
+        local = base / rel
+        if local.exists():
+            return str(local)
     return shutil.which("ffprobe")
 
 

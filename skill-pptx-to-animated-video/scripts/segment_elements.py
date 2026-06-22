@@ -15,6 +15,7 @@ Usage: python segment_elements.py [slide numbers...]
 """
 
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -34,11 +35,23 @@ DEBUG = ROOT / "work_preview" / "element_debug"
 GALLERY = ROOT / "work_preview"
 WIDTH, HEIGHT = config.PROJECT["canvas"]["width"], config.PROJECT["canvas"]["height"]
 
+# Recover cards whose hand-drawn border is broken on ONE side where a
+# neighbouring drawing (an arrow, the funnel on slide 2) snaps it -- the strict
+# all-four-sides ring test dropped them into the background. Regression-tested
+# across 5 decks / 67 slides: recovers real cards on 8 slides, zero collapses,
+# and is bit-identical to the strict gate when off. Escape hatch:
+# SEG_RING_RELAX=0. See has_card_border / the weak-card handling in detect_cards.
+RING_RELAX = os.environ.get("SEG_RING_RELAX", "1") != "0"
+
 
 def find_ffprobe():
-    local = ROOT / "node_modules" / "ffprobe-static" / "bin" / "win32" / "x64" / "ffprobe.exe"
-    if local.exists():
-        return str(local)
+    # node_modules lives at the project root, but ROOT is the task dir one level
+    # down, so search ROOT and its ancestors (mirrors media.find_ffprobe).
+    rel = Path("node_modules") / "ffprobe-static" / "bin" / "win32" / "x64" / "ffprobe.exe"
+    for base in (ROOT, *ROOT.parents):
+        local = base / rel
+        if local.exists():
+            return str(local)
     return shutil.which("ffprobe")
 
 
@@ -409,10 +422,9 @@ def tight_refine(box, raw_mask, pad=5):
     return [x1, y1, x2 - x1, y2 - y1]
 
 
-def border_ring_fraction(connected, box):
-    """Evidence that a drawn rectangular border surrounds a hole: for each
-    side, the best single row/column of the thin band just outside the hole
-    bbox must be almost fully covered in ink -- a real border stroke is one
+def border_ring_sides(connected, box):
+    """Per-side border evidence: for each side, the best single row/column of
+    the thin band just outside the hole bbox -- a real border stroke is one
     continuous straight line there. Aggregating the whole band instead would
     let dilated neighbouring text fake a border, which is exactly how phantom
     holes (empty space fenced in by frames, connector webs, curved arrows)
@@ -430,7 +442,27 @@ def border_ring_fraction(connected, box):
             continue
         coverage = (band > 0).mean(axis=axis)
         sides.append(float(coverage.max()))
-    return min(sides)
+    return sides
+
+
+def border_ring_fraction(connected, box):
+    return min(border_ring_sides(connected, box))
+
+
+def has_card_border(connected, box):
+    """A hole is card-enclosed if its border is drawn on (nearly) every side.
+
+    A hand-drawn card abutting another drawing (an arrow head, the funnel on
+    slide 2) can have ONE side's stroke broken where the neighbour occludes
+    it. Allow that: the three best sides must still read as full strokes
+    (>=0.85) and the weakest must show a real, if broken, stroke (>=0.50) --
+    a phantom hole is fully OPEN (~0) on its unframed sides, so this floor
+    keeps them out, and the interior-ink gate already rejects empty corridors.
+    """
+    sides = sorted(border_ring_sides(connected, box))
+    if not RING_RELAX:
+        return sides[0] >= 0.85
+    return sides[1] >= 0.85 and sides[0] >= 0.50
 
 
 def detect_cards(connected, raw):
@@ -438,6 +470,7 @@ def detect_cards(connected, raw):
     drawn borders, which survive even when arrow tips touch the borders."""
     contours, hierarchy = cv2.findContours(connected, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
     cards = []
+    weak_cards = []
     if hierarchy is None:
         return cards
     for idx, c in enumerate(contours):
@@ -459,7 +492,7 @@ def detect_cards(connected, raw):
         # Phantom holes (empty space fenced in by frames, connector webs or
         # curved arrows) pass the rectangularity test but have no drawn border
         # of their own; merging them would chain unrelated cards together.
-        if border_ring_fraction(connected, (x, y, w, h)) < 0.85:
+        if not has_card_border(connected, (x, y, w, h)):
             continue
         # A corridor between two panels is fenced by real borders on all four
         # sides and passes the ring test, and the arrows crossing it give it a
@@ -467,7 +500,16 @@ def detect_cards(connected, raw):
         interior = raw[y + 12 : y + h - 12, x + 12 : x + w - 12]
         if interior.size == 0 or float((interior > 0).mean()) < 0.06:
             continue
-        cards.append([x, y, w, h])
+        # A card admitted only because the relaxation tolerated one broken
+        # border side is a "maybe-card": detect it standalone, but keep it OUT
+        # of the chaining pass below. A weak-bordered hole sitting between two
+        # real cards otherwise bridges them into one blob (slide 6 chained
+        # Model D + E through such a hole). Strong (all-sides) cards still chain
+        # -- that is how table cells sharing a border join.
+        if min(border_ring_sides(connected, (x, y, w, h))) < 0.85:
+            weak_cards.append([x, y, w, h])
+        else:
+            cards.append([x, y, w, h])
 
     def card_adjacent(a, b):
         # Unpadded interiors: true table cells are separated only by their
@@ -483,6 +525,16 @@ def detect_cards(connected, raw):
         return False
 
     cards = merge_pass(cards, card_adjacent)
+    if weak_cards:
+        # A weak-bordered hole that overlaps a strong card is a broken border
+        # bridging two real cards (slide 6 Model D/E merged through their snapped
+        # shared edge), not a new card -- drop it. A genuinely recovered card
+        # (slide 2 Marketing Spend) sits in open space clear of its neighbours.
+        weak_cards = [
+            wc for wc in weak_cards
+            if all(intersection_area(wc, sc) == 0 for sc in cards)
+        ]
+    cards = cards + weak_cards
     padded = []
     for x, y, w, h in cards:
         pad = 12  # cover the border stroke around the interior
