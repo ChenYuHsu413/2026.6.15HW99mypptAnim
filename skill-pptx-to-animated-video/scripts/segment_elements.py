@@ -980,16 +980,24 @@ def merge_card_headers(items, img, raw):
             continue
         if typ(h) != "key_point_card":
             continue
-        while True:  # chain downward through the stacked body text
+        while True:  # chain through the stacked body text + split-header halves
             hx, hy, hw, hh = h["box"]
             absorbed = None
             for t in out:
-                if t is h or t["card"] or typ(t) not in ("text_block", "annotation"):
+                if t is h:
                     continue
                 tx, ty, tw, th = t["box"]
-                gap = ty - (hy + hh)
-                ox = max(0, min(hx + hw, tx + tw) - max(hx, tx))
-                if 0 <= gap < 45 and ox >= 0.5 * min(hw, tw):
+                tt = typ(t)
+                # (a) border-less body text directly below the header
+                if not t["card"] and tt in ("text_block", "annotation"):
+                    gap = ty - (hy + hh)
+                    ox = max(0, min(hx + hw, tx + tw) - max(hx, tx))
+                    if 0 <= gap < 45 and ox >= 0.5 * min(hw, tw):
+                        absorbed = t
+                        break
+                # (b) a card fragment (e.g. the other half of a header bar split
+                #     by a pushpin) now mostly inside the growing card
+                if tt == "key_point_card" and intersection_area(h["box"], t["box"]) >= 0.6 * tw * th:
                     absorbed = t
                     break
             if absorbed is None:

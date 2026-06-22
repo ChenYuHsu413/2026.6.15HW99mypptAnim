@@ -299,9 +299,11 @@ scope.
   broken, so it fragments into a SHORT header card + the body text below it.
   `merge_card_headers` re-absorbs `text_block`/`annotation` pieces sitting
   directly below a short (`h < 130`) key_point_card header (same column, gap
-  `< 45px`), chaining downward, so the card animates as one unit. It only
-  absorbs BORDER-LESS text — a vertical stack of full bordered cards (a list)
-  is untouched because those are cards, not loose text.
+  `< 45px`), chaining downward, so the card animates as one unit. It also pulls
+  in a card fragment (e.g. the other half of a header bar split by a pushpin)
+  that ends up ≥60% inside the merged card. It only absorbs BORDER-LESS text or
+  a contained fragment — a vertical stack of separate full bordered cards (a
+  list) is untouched because those are distinct, non-overlapping cards.
 - **Watermarks** (e.g. NotebookLM, bottom-right) stay in the background.
 - **Verification is non-negotiable**: compositing background + all layers
   must reproduce the original with 0 px diff (>20 intensity) on every slide.
