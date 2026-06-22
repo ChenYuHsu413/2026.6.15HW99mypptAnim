@@ -963,6 +963,43 @@ def classify(box, img, raw_mask, is_card, is_highlight):
     return "illustration"
 
 
+def merge_card_headers(items, img, raw):
+    """A card whose body lost its border to an overlapping neighbour (e.g. a
+    corkboard where cards overlap) fragments into a SHORT header card plus the
+    body text below it. Re-absorb text_block / annotation pieces sitting
+    directly below such a header (same column, tight gap) so the card animates
+    as one unit. Only a short key_point_card header absorbing BORDER-LESS text
+    triggers this -- a vertical stack of full bordered cards (a list) is left
+    alone because those pieces are cards, not loose text."""
+    def typ(it):
+        return classify(it["box"], img, raw, it["card"], it["highlight"])
+
+    out = list(items)
+    for h in list(out):
+        if h not in out or h["box"][3] >= 130 or h["card"] is not True:
+            continue
+        if typ(h) != "key_point_card":
+            continue
+        while True:  # chain downward through the stacked body text
+            hx, hy, hw, hh = h["box"]
+            absorbed = None
+            for t in out:
+                if t is h or t["card"] or typ(t) not in ("text_block", "annotation"):
+                    continue
+                tx, ty, tw, th = t["box"]
+                gap = ty - (hy + hh)
+                ox = max(0, min(hx + hw, tx + tw) - max(hx, tx))
+                if 0 <= gap < 45 and ox >= 0.5 * min(hw, tw):
+                    absorbed = t
+                    break
+            if absorbed is None:
+                break
+            h["box"] = union_box(h["box"], absorbed["box"])
+            h["sort_box"] = list(h["box"])
+            out.remove(absorbed)
+    return out
+
+
 def extract_red_annotations(img, red_loose, box):
     """Find red annotation marks (note text, vector arrows, stars) drawn on a
     chart, separable from same-coloured data curves by glyph size and stroke
@@ -1065,6 +1102,7 @@ def segment_slide(slide_num, debug=True):
             old.unlink()
 
     items, raw = detect_elements(img, slide_num)
+    items = merge_card_headers(items, img, raw)
     # Reading order: cluster items into rows by vertical centre, then go
     # left-to-right inside each row. (Fixed-size banding misorders rows whose
     # centres straddle a band boundary.)

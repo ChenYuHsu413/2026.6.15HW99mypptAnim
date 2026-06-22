@@ -294,6 +294,14 @@ scope.
   any union whose bbox exceeds 0.78×width AND 0.60×height (the MAX_LAYERS
   capping pass is the lone exception, `guard=False`). Same principle as the
   collage/card area caps, applied to the merge cascade.
+- **A card body that lost its border re-merges with its header.** When cards
+  overlap (a corkboard, staggered boxes), an occluded card's drawn border is
+  broken, so it fragments into a SHORT header card + the body text below it.
+  `merge_card_headers` re-absorbs `text_block`/`annotation` pieces sitting
+  directly below a short (`h < 130`) key_point_card header (same column, gap
+  `< 45px`), chaining downward, so the card animates as one unit. It only
+  absorbs BORDER-LESS text — a vertical stack of full bordered cards (a list)
+  is untouched because those are cards, not loose text.
 - **Watermarks** (e.g. NotebookLM, bottom-right) stay in the background.
 - **Verification is non-negotiable**: compositing background + all layers
   must reproduce the original with 0 px diff (>20 intensity) on every slide.
