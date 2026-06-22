@@ -189,6 +189,10 @@ scope.
    ```
    Match the deck's language (zh-TW deck → 繁體中文旁白). Pace ≈ 130–160
    chars/min; each slide's text should speak in roughly 10–16 s.
+   The server's `/pipeline` has an `auto_narration` fallback that seeds this
+   file from OCR text so a standalone run never dead-ends — but OCR drafts are
+   only stitched-together slide fragments (no understanding) and read poorly,
+   so always prefer writing the narration yourself.
 3. **TTS**: `tts_edge.py [voice] [rate]` (defaults: `zh-TW-HsiaoChenNeural`,
    rate `-8%` — teaching pace). Pass a different voice for other languages.
    For a snappier delivery use `+38%` (≈1.5× the default speech speed) or
@@ -283,19 +287,48 @@ scope.
   (12% of the footer's 124px height) would otherwise be absorbed and
   inflate the card across the whole slide. Rule: `cut > 14 AND cut > 0.20 *
   perpendicular_dim`.
+- **No layer may span the whole slide.** `merge_pass` and the `absorb` loop
+  (unlike `collage_cluster`/`detect_cards`) had no size cap, so dense layouts
+  (a pyramid + its side notes, a ring of repeated icons) could fuse into one
+  slide-wide blob that only animates as a single chunk. `absorb()` now refuses
+  any union whose bbox exceeds 0.78×width AND 0.60×height (the MAX_LAYERS
+  capping pass is the lone exception, `guard=False`). Same principle as the
+  collage/card area caps, applied to the merge cascade.
 - **Watermarks** (e.g. NotebookLM, bottom-right) stay in the background.
 - **Verification is non-negotiable**: compositing background + all layers
   must reproduce the original with 0 px diff (>20 intensity) on every slide.
 
-### Per-slide OVERRIDES vs algorithm changes
+### Per-slide segmentation overrides vs algorithm changes
 
-The `OVERRIDES` dict at the top of `segment_elements.py` is the escape hatch
-for slides whose ground truth doesn't generalize cleanly. **Prefer fixing the
-algorithm over adding an override** — the user wants this pipeline to be a
-reusable skill, not a per-deck hack. Add an override only when the same
-pattern would mis-fire on another deck if generalized. Each entry can specify
-`merge` boxes, `suppress` regions, `order` regions, `tight`/`exclude_red`/
-`absorb`/`type` flags on a merge.
+`OVERRIDES` (top of `segment_elements.py`) is the escape hatch for slides whose
+ground truth doesn't generalize. It is **empty in the skill baseline** and
+loaded per deck from `<task>/seg_overrides.json` (keyed by slide number) via
+`_load_seg_overrides()` — deck-specific tuning lives in that JSON instead of
+forking the script (mirrors the per-task `overrides.json` convention). NOTE this
+is a *segmentation-time* file, distinct from the post-segmentation
+`overrides.json`, which can only hide/move/retime already-cut layers — never
+split or reshape them. **Prefer fixing the algorithm over adding an override**;
+add one only when generalizing the pattern would mis-fire on other decks.
+
+Each slide entry may contain:
+- `merge`: `{box, ...}` list — collapse pieces in the region into one layer.
+  Flags: `tight` (carve from raw ink, ignore absorbed bboxes — splits a welded
+  piece); `absorb` (override the 0.6 coverage threshold — lower it to consume a
+  too-wide detected piece); `exclude_red`; `type` (force-classify);
+  `no_annot` (this chart/table must NOT auto-extract red `annotation` layers);
+  `irregular` (below).
+- `suppress`: regions whose pieces drop back to the background (corner doodles, noise).
+- `order`: bucket regions for a non-standard reveal order.
+
+**`irregular` — true non-rectangular cut.** Layers export as opaque rectangular
+crops by default (alpha=255; only annotations/highlights get a mask), which is
+why a layer bbox can visually cover a neighbour. `irregular: true` cuts the layer
+to its real silhouette: foreground = pixels differing from the paper colour
+(`fill_color`) by >22, morphologically closed into one region, then contours
+filled — so flat PALE fills (a pyramid's grey base tier, which carries no
+dark/saturated ink) are kept, not dropped. Background reconstruction removes only
+the silhouette (not the full bbox) so surrounding paper texture survives.
+Reconstruction must still be 0-px-diff.
 
 ## Timing rules
 
