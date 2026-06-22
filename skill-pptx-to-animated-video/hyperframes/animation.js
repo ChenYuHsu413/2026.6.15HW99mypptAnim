@@ -27,7 +27,7 @@ function showSlide(comp, slide) {
   base.src = `../${slide.background}`;
   slideRoot.appendChild(base);
   for (const layer of slide.layers) {
-    if (layer.type === 'key_point_card') continue;  // matches the renderer
+    if (layer.hidden) continue;
     const img = document.createElement('img');
     img.className = `layer ${layer.enter.type}`;
     img.src = `../${layer.image}`;
