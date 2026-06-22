@@ -64,8 +64,10 @@ def convert_to_pdf(src, out_dir=None) -> Path:
     soffice = find_soffice()
     if soffice is None:
         raise RuntimeError(
-            "LibreOffice 'soffice' not found. Install LibreOffice or set the "
-            "SOFFICE env var to the soffice executable path."
+            "LibreOffice 'soffice' not found, so .pptx/.ppt can't be converted. "
+            "Options: run the server via Docker (bundles LibreOffice + ffmpeg, "
+            "see DEPLOY.md), install LibreOffice and set the SOFFICE env var if "
+            "it's in a non-standard path, or just upload the deck as a PDF."
         )
 
     r = subprocess.run(

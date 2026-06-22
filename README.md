@@ -21,6 +21,20 @@
 
 每個 task folder 都是自包含的；共用邏輯都在 skill 裡。
 
+## 安裝 / 部署
+
+跑這套 pipeline 的機器需要 Python 套件 + 兩個系統二進位：**LibreOffice**（PPTX/PPT→PDF）與
+**ffmpeg/ffprobe**（音長 + render）。**只上傳 PDF 的話不需要 LibreOffice。**
+
+```powershell
+pip install -r requirements.txt
+```
+
+LibreOffice / ffmpeg 的各 OS 安裝指令，以及「一個 `docker run` 全包、零手動安裝」的 Docker 方式，
+見 [`DEPLOY.md`](DEPLOY.md)（搭配根目錄 `Dockerfile`）。
+
+> 轉檔是在**跑 server 的那台機器**上做的——開瀏覽器的使用者什麼都不用裝。
+
 > **session 4（2026-06-18）大改架構**：引入 `composition.json`「resolved 合約」+ `overrides.json`
 > 編輯層 + config 三檔，並把渲染器與瀏覽器預覽都改讀同一份合約。新增 repo 根目錄的共用
 > **pipeline-ui** 可視化編輯介面。詳見下方〈設定與編輯〉與 [`ANALYSIS_REPORT.md`](ANALYSIS_REPORT.md)。
@@ -111,6 +125,25 @@ python "$SK/render_final_video.py"
 
 切圖過程可視化：`task=HW6-Startup50-Summary/work_preview/element_debug/slide_##_debug.jpg`（原圖／偵測框／挖空背景／重組驗證），
 攤開圖：`task=HW6-Startup50-Summary/work_preview/slide_##_layer_gallery.jpg`（每層的透明 PNG、座標、出場時間）。
+
+> **「不橫跨整張」上限**：`merge_pass` / `absorb` 任何會把框長到橫跨整張投影片（>0.78W × 0.6H）的
+> 合併一律拒絕（與 `collage_cluster`/`detect_cards` 的上限同一原則）。避免密集版面（金字塔、重複元素環）
+> 被併成一塊只能整片淡入的 blob。
+
+### Per-deck 切圖微調（`seg_overrides.json`）
+
+少數投影片若通用演算法切得不理想，可在該 task 根目錄放 `seg_overrides.json`（keyed by slide number）
+做 per-deck 微調，**不必改共用演算法**（沿用切圖腳本內建的 override 機制，符合 per-task JSON 慣例）：
+
+| 欄位 | 作用 |
+|---|---|
+| `merge` | 把區域內 piece 併成一塊（`tight` 拆開焊在一起的、`absorb` 調覆蓋門檻、`type` 強制分類） |
+| `suppress` | 把區域內 piece 丟回背景（角落塗鴉、雜訊） |
+| `order` | 指定出場順序 |
+| `no_annot` | 該 chart/table 不要自動抽出紅色 annotation 層 |
+| `irregular` | 切成元素**真實輪廓**（四角透明、背景只挖形狀），適合三角形/金字塔等非矩形；bbox 與鄰居重疊也不會用矩形蓋住。判定用「與紙張底色差異 → 連通填補」，連淺色平面填色也算同一區塊 |
+
+原則仍是「優先修演算法、override 是少數例外」。格式範例與實作見 [`WORK_REPORT.md`](WORK_REPORT.md) §12.6。
 
 ## 旁白 / Voiceover
 

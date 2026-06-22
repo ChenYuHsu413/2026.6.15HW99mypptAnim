@@ -1,0 +1,19 @@
+# Python dependencies for the pptx-to-animated-video pipeline.
+#   pip install -r requirements.txt
+#
+# System binaries are NOT pip-installable and must also be present:
+#   - libreoffice  (PPTX/PPT -> PDF conversion on upload)
+#   - ffmpeg / ffprobe  (audio duration + final video render)
+# The Dockerfile installs both automatically; see DEPLOY.md for bare-metal.
+
+pymupdf==1.27.2.3
+opencv-python==4.13.0.92
+numpy==2.4.3
+Pillow==12.1.1
+edge-tts==7.2.8
+rapidocr==3.8.4
+onnxruntime==1.27.0
+
+# Optional: precise (waveform-aligned) subtitles. Heavy (pulls in torch).
+# Without it the pipeline falls back to char-proportional subtitle timing.
+# whisper-timestamped

@@ -485,6 +485,39 @@ def _add_to_task_index(name):
     return True
 
 
+def _remove_from_task_index(task_path):
+    """Drop the task entry from task-index.json. Returns True if an entry was removed."""
+    idx_path = ROOT / "task-index.json"
+    try:
+        idx = json.loads(idx_path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        return False
+    kept = [e for e in idx if e.get("path") != task_path]
+    if len(kept) == len(idx):
+        return False
+    idx_path.write_text(
+        json.dumps(kept, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    return True
+
+
+def delete_task(task_dir):
+    """Delete a task directory and unregister it from task-index.json.
+
+    Guard: only a `task=<name>/` directory directly under ROOT may be removed —
+    never ROOT itself or anything outside it.
+    """
+    import shutil
+
+    if task_dir == ROOT or task_dir.parent != ROOT or not task_dir.name.startswith("task="):
+        return 400, {"status": "error",
+                     "message": "refusing to delete: not a task directory"}
+    removed = _remove_from_task_index(task_dir.name)
+    shutil.rmtree(task_dir, ignore_errors=True)
+    return 200, {"status": "ok", "message": f"deleted {task_dir.name}",
+                 "indexRemoved": removed}
+
+
 def ingest_deck(task_name, filename, data):
     """Stage an uploaded deck under task=<name>/, converting PPTX → PDF if needed.
 
@@ -541,6 +574,30 @@ def ingest_deck(task_name, filename, data):
     }
 
 
+_OCR_NUMERIC_RE = re.compile(r"^[\d.,:%+/=()\-\s]+$")  # chart axis ticks / bare numbers
+
+
+def _clean_ocr_lines(raw_lines):
+    """Drop OCR layout noise and dedupe, preserving order. Seeds a narration
+    draft from slide OCR — filters single-char fragments, deck-footer
+    watermarks, and pure-number lines (chart axis ticks like '9400' / '0.930').
+    Formula soup and diagram labels can't be filtered safely and will remain."""
+    seen, out = set(), []
+    for ln in raw_lines:
+        s = ln.strip()
+        if len(s) < 2:                  # single-char / empty layout fragments
+            continue
+        if "notebook" in s.lower():     # deck footer watermark (OCR-mangled variants)
+            continue
+        if _OCR_NUMERIC_RE.match(s):    # chart axis ticks / bare numbers
+            continue
+        if s in seen:
+            continue
+        seen.add(s)
+        out.append(s)
+    return out
+
+
 def make_starter_narration(task_dir):
     """Create narration/narration_script.md with one section per slide.
 
@@ -559,27 +616,30 @@ def make_starter_narration(task_dir):
     md_path = narration_dir / "narration_script.md"
     if md_path.exists():
         return None, f"{md_path.name} already exists — not overwriting"
-    sections = [f"# {task_dir.name} — 旁白腳本"]
+    sections = [
+        f"# {task_dir.name} — 旁白腳本\n"
+        "\n以下為 OCR 自動草稿：只是投影片上的文字片段，尚未口語化。"
+        "請在 UI 的旁白編輯器中改寫成順暢的旁白。（此行不會被唸出來）"
+    ]
     ocr_hits = 0
     for sd in slide_dirs:
         num = sd.name.replace("slide_", "")
-        body_lines = None
+        title, body = None, None
         ocr_path = sd / "slide_ocr.json"
         if ocr_path.exists():
             try:
                 ocr = json.loads(ocr_path.read_text(encoding="utf-8"))
-                text = (ocr.get("text") or "").strip()
-                if text:
-                    body_lines = text.splitlines()
+                lines = _clean_ocr_lines((ocr.get("text") or "").splitlines())
+                if lines:
+                    title = lines[0]
+                    body = "，".join(lines) + "。"
                     ocr_hits += 1
             except (json.JSONDecodeError, OSError):
                 pass
-        if body_lines:
-            # Collapse short OCR fragments into prose-ish paragraphs; user edits afterward.
-            body = " ".join(line.strip() for line in body_lines if line.strip())
-        else:
+        header = f"## Slide {num}" + (f" - {title}" if title else "")
+        if not body:
             body = f"這是第 {int(num)} 張投影片的佔位旁白，請在 UI 的旁白編輯器中改寫成實際內容。"
-        sections.append(f"\n## Slide {num}\n\n{body}")
+        sections.append(f"\n{header}\n\n{body}")
     md_path.write_text("\n".join(sections), encoding="utf-8")
     src = (
         f"seeded from OCR for {ocr_hits}/{len(slide_dirs)} slides"
@@ -608,10 +668,8 @@ def run_pipeline(task_dir):
     plan = [
         ("render_slides.py", [str(pdf)], True, ""),
         ("ocr_slides.py", [], True, ""),
-        ("tts_edge.py", [], narration_md.exists(),
-         f"narration/narration_script.md missing — write one section per slide "
-         f"(e.g. '# Slide 1\\n你的旁白...') under {pdf.parent.name}/narration/ "
-         "and click Run pipeline again"),
+        ("auto_narration", [], True, ""),  # in-process: seed narration from OCR if missing
+        ("tts_edge.py", [], True, ""),
         ("segment_elements.py", [], True, ""),
         ("build_timeline.py", [], True, ""),
         ("align_subtitles.py", [], True, ""),  # no-op when whisper-timestamped not installed
@@ -628,6 +686,18 @@ def run_pipeline(task_dir):
         if not cond:
             results.append({"step": name, "status": "skipped", "log": hint})
             halted = True  # downstream steps need this step's output
+            continue
+        if name == "auto_narration":
+            if narration_md.exists():
+                results.append({"step": "auto_narration", "status": "skipped",
+                                "log": "narration_script.md present — using your script"})
+            else:
+                path, msg = make_starter_narration(task_dir)
+                if path is None:
+                    results.append({"step": "auto_narration", "status": "error", "log": msg})
+                    halted = True
+                else:
+                    results.append({"step": "auto_narration", "status": "ok", "log": msg})
             continue
         script = SKILL_DIR / name
         if not script.exists():
@@ -884,6 +954,9 @@ class Handler(BaseHTTPRequestHandler):
                                         "message": "missing 'aspect' (16:9 | 9:16 | 1:1)"})
             steps = set_aspect(task_dir, aspect)
             self._json(200, {"status": "ok", "steps": steps})
+        elif route == "/delete-task":
+            code, body_out = delete_task(task_dir)
+            self._json(code, body_out)
         elif route == "/starter-narration":
             path, msg = make_starter_narration(task_dir)
             if path is None:

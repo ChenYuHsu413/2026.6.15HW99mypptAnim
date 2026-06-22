@@ -1,0 +1,13 @@
+.git
+.agents
+.opencode
+claude-backup
+my-video
+node_modules
+**/work_preview
+**/__pycache__
+*.pyc
+# Per-deck outputs are regenerated at runtime; don't bake them into the image.
+task=*/output
+task=*/audio
+task=*/*.mp4

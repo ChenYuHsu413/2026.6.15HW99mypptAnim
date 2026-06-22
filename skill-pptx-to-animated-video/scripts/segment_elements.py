@@ -97,8 +97,19 @@ MAX_LAYERS = 16
 #             standard reading order the row-cluster sort wouldn't pick up.
 # Prefer fixing the algorithm over adding an override -- this skill is meant
 # to be reusable. Only override when the same pattern would mis-fire on
-# another deck if generalized.
-OVERRIDES = {}
+# another deck if generalized. Deck-specific entries live in the deck's own
+# seg_overrides.json (keyed by slide number) so this shared baseline stays
+# empty and generic; that keeps the new per-task-JSON convention instead of
+# forking this whole script per deck.
+def _load_seg_overrides():
+    try:
+        raw = json.loads((ROOT / "seg_overrides.json").read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+    return {int(k): v for k, v in raw.items()}
+
+
+OVERRIDES = _load_seg_overrides()
 
 
 def load_slide(slide_num):
@@ -544,6 +555,8 @@ def apply_overrides(items, raw, img, slide_num):
             "card": any(it["card"] for it in inside),
             "highlight": any(it["highlight"] for it in inside),
             "force_type": spec.get("type"),
+            "no_annot": spec.get("no_annot", False),
+            "irregular": spec.get("irregular", False),
         }
         if excluded:
             # Hole out ALL red ink in the region (the stamp's frame reaches
@@ -629,7 +642,20 @@ def detect_elements(img, slide_num):
         if w > 1200 and h < 40 and (y < 40 or y + h > HEIGHT - 30):
             continue
         pieces.append([x, y, w, h])
-    pieces = merge_pass(pieces, lambda a, b: should_merge(a, b, raw_remaining))
+    # A merge that grows a box across most of the slide is fusing distinct
+    # elements (a diagram + its side notes, a ring of repeated icons) into one
+    # blob that can only animate as a single chunk. merge_pass / the later
+    # absorb loop have no slide-span cap of their own (unlike collage_cluster
+    # and detect_cards), so add one here: refuse a union that spans both axes.
+    SPAN_W, SPAN_H = 0.78 * WIDTH, 0.60 * HEIGHT
+
+    def spans_slide(box):
+        return box[2] > SPAN_W and box[3] > SPAN_H
+
+    pieces = merge_pass(
+        pieces,
+        lambda a, b: should_merge(a, b, raw_remaining) and not spans_slide(union_box(a, b)),
+    )
     pieces = collage_cluster(pieces, raw_remaining)
 
     # Group red annotation strokes (circle, doodle arrow, note text) together.
@@ -710,10 +736,16 @@ def detect_elements(img, slide_num):
             if changed:
                 break
 
-    def absorb(keep, other):
+    def absorb(keep, other, guard=True):
+        # Refuse a merge that grows the box across most of the slide -- that
+        # fuses distinct elements into one blob that can only animate together.
+        # (MAX_LAYERS capping passes guard=False: there, reducing count wins.)
+        if guard and spans_slide(union_box(keep["box"], other["box"])):
+            return False
         keep["box"] = union_box(keep["box"], other["box"])
         keep["card"] = keep["card"] or other["card"]
         keep["highlight"] = keep["highlight"] or other["highlight"]
+        return True
 
     # Rectangular bboxes may graze each other (highlight group over the next
     # card, arrow pad touching a card border); only merge substantial overlap.
@@ -743,7 +775,8 @@ def detect_elements(img, slide_num):
                     smaller, bigger = (items[i], items[j]) if a[2] * a[3] < b[2] * b[3] else (items[j], items[i])
                     if smaller["card"] and not bigger["card"]:
                         continue
-                absorb(items[i], items[j])
+                if not absorb(items[i], items[j]):
+                    continue  # spanning union refused -> keep elements separate
                 items.pop(j)
                 changed = True
                 break
@@ -807,9 +840,10 @@ def detect_elements(img, slide_num):
             if not options:
                 # Overlap too deep to trim away: the piece genuinely spans the
                 # card, so they belong together.
-                absorb(card_item, item)
-                items.remove(item)
-                break
+                if absorb(card_item, item):
+                    items.remove(item)
+                    break
+                continue
             cut, side = min(options)
             # A small piece (arrow) never has ink inside the card rect -- its
             # overlap is only bbox padding, so trimming is always safe. A big
@@ -820,9 +854,10 @@ def detect_elements(img, slide_num):
             # gets falsely absorbed and inflates the card across the slide.
             perp = box[3] if side in ("top", "bottom") else box[2]
             if not small and cut > 14 and cut > 0.20 * perp:
-                absorb(card_item, item)
-                items.remove(item)
-                break
+                if absorb(card_item, item):
+                    items.remove(item)
+                    break
+                continue
             if side == "left":
                 box[0] += cut
                 box[2] -= cut
@@ -851,8 +886,8 @@ def detect_elements(img, slide_num):
                 continue
             gap_x, gap_y, _, _ = axis_gap_overlap(item["box"], card_item["box"])
             if gap_x + gap_y < 8:
-                absorb(card_item, item)
-                items.remove(item)
+                if absorb(card_item, item):
+                    items.remove(item)
                 break
 
     # Axis tick labels, rotated axis names and captions belong to the big
@@ -874,8 +909,7 @@ def detect_elements(img, slide_num):
                     continue
                 if bb[2] > 600 and bb[3] > 300:
                     gap_x, gap_y, _, _ = axis_gap_overlap(box, bb)
-                    if gap_x + gap_y < 50:
-                        absorb(big, item)
+                    if gap_x + gap_y < 50 and absorb(big, item):
                         items.remove(item)
                         changed = True
                         break
@@ -894,7 +928,7 @@ def detect_elements(img, slide_num):
                 if best is None or d < best[0]:
                     best = (d, i, j)
         _, i, j = best
-        absorb(items[i], items[j])
+        absorb(items[i], items[j], guard=False)  # capping count wins over span
         items.pop(j)
 
     return items, raw
@@ -1082,7 +1116,7 @@ def segment_slide(slide_num, debug=True):
             mask=item.get("force_mask"), src=item,
         )
         entries.append(entry)
-        if layer_type in ("chart", "table"):
+        if layer_type in ("chart", "table") and not item.get("no_annot"):
             for group in extract_red_annotations(img, red_loose, item["box"]):
                 entry["annot_masks"].append(group["mask"])
                 entries.append(
@@ -1118,6 +1152,25 @@ def segment_slide(slide_num, debug=True):
         alpha = np.full((h, w), 255, dtype=np.uint8)
         if item["mask"] is not None:
             alpha = item["mask"][y : y + h, x : x + w]
+        elif item.get("irregular"):
+            # Cut to the element's real silhouette instead of its bounding
+            # rectangle. Ink (dark/saturated) alone misses flat pale fills -- a
+            # pyramid's grey base tier is neither dark nor saturated -- so key
+            # off "differs from the paper colour" instead: every such pixel is
+            # foreground, closed into one continuous region, then the silhouette
+            # contours are filled. Transparent elsewhere, so the bbox may
+            # overlap a neighbour without a rectangular block hiding it.
+            reg = img[y : y + h, x : x + w].astype(np.float32)
+            dist = np.linalg.norm(reg - np.array(fill_color, np.float32), axis=2)
+            fg = cv2.morphologyEx(
+                (dist > 22).astype(np.uint8) * 255, cv2.MORPH_CLOSE,
+                cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (21, 21)),
+            )
+            contours, _ = cv2.findContours(
+                fg, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+            )
+            alpha = np.zeros((h, w), dtype=np.uint8)
+            cv2.drawContours(alpha, contours, -1, 255, thickness=cv2.FILLED)
         for annot in item["annot_masks"]:
             region = annot[y : y + h, x : x + w] > 0
             crop[region] = fill_color
@@ -1136,7 +1189,13 @@ def segment_slide(slide_num, debug=True):
                     sub = alpha[iy1 - y : iy2 - y, ix1 - x : ix2 - x]
                     sub[:] = red[iy1:iy2, ix1:ix2]
         Image.fromarray(np.dstack([crop, alpha])).save(slide_dir / filename)
-        cv2.rectangle(background, (x, y), (x + w - 1, y + h - 1), fill_color, -1)
+        if item.get("irregular") and item["mask"] is None:
+            # Remove only the silhouette from the background so the paper
+            # texture around the shape survives (a full-rect fill would leave
+            # solid corners showing through the transparent parts).
+            background[y : y + h, x : x + w][alpha > 0] = fill_color
+        else:
+            cv2.rectangle(background, (x, y), (x + w - 1, y + h - 1), fill_color, -1)
         cue_text = layer_type  # refine narration cues in narration_timing.json
         if layer_type == "annotation":
             # The chart it is drawn on must be fully visible first.

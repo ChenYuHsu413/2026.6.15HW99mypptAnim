@@ -20,7 +20,7 @@ const taskSelect=$('taskSelect'),themeSelect=$('themeSelect'),
   renderDialog=$('renderDialog'),renderFrom=$('renderFrom'),
   renderTo=$('renderTo'),renderGo=$('renderGo'),
   renderClose=$('renderClose'),renderLog=$('renderLog'),
-  uploadBtn=$('uploadBtn'),uploadDialog=$('uploadDialog'),
+  uploadBtn=$('uploadBtn'),deleteTaskBtn=$('deleteTaskBtn'),uploadDialog=$('uploadDialog'),
   upTaskName=$('upTaskName'),upFile=$('upFile'),
   upGo=$('upGo'),upClose=$('upClose'),upLog=$('upLog');
 // Editor-only nodes (kept as null so old code paths short-circuit safely).
@@ -203,8 +203,8 @@ function showPendingTask(tp, pdfHint){
   slideList.innerHTML='';
   slideLabel.textContent='Pending';
   slideTitleEl.textContent='Pipeline not yet run for this task';
-  statsEl.innerHTML='';narrationEl.value='';layerList.innerHTML='';timelineEl.innerHTML='';
-  layerEdit.hidden=true;audioEl.removeAttribute('src');audioEl.hidden=true;
+  statsEl.innerHTML='';narrationEl.value='';if(layerList)layerList.innerHTML='';timelineEl.innerHTML='';
+  if(layerEdit)layerEdit.hidden=true;audioEl.removeAttribute('src');audioEl.hidden=true;
   const pdf=pdfHint? pdfHint.split('/').pop() : '<YOUR_DECK>.pdf';
   preview.innerHTML=
     `<div style="padding:24px;line-height:1.6;color:var(--muted)">`+
@@ -1069,6 +1069,22 @@ upGo.addEventListener('click',async()=>{
 
 // ── Task / Theme ────────────────────────────────────────────────────
 taskSelect.addEventListener('change',async e=>{taskSelect.disabled=true;await loadTask(e.target.value);taskSelect.disabled=false;});
+deleteTaskBtn.addEventListener('click',async()=>{
+  const tp=taskSelect.value;if(!tp)return;
+  const label=S.tasks.find(t=>t.path===tp)?.label||tp;
+  if(!confirm(`確定要刪除 task「${label}」嗎？\n資料夾 ${tp}/ 會被永久刪除，無法復原。`))return;
+  deleteTaskBtn.disabled=true;
+  try{
+    const r=await fetch('/delete-task',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({task:tp})});
+    const d=await r.json().catch(()=>({status:'error',message:'bad response'}));
+    if(d.status!=='ok'){alert('刪除失敗：'+(d.message||''));deleteTaskBtn.disabled=false;return;}
+    await refreshTaskIndex();
+    const next=S.tasks[0]?.path;
+    if(next){taskSelect.value=next;await loadTask(next);}
+    else{taskTitle.textContent='Pipeline';}
+  }catch(e){alert('刪除失敗：'+e.message);}
+  deleteTaskBtn.disabled=false;
+});
 const saved=localStorage.getItem('pui-theme')||'dark';document.documentElement.className=`theme-${saved}`;themeSelect.value=saved;
 themeSelect.addEventListener('change',()=>{const t=themeSelect.value;document.documentElement.className=`theme-${t}`;localStorage.setItem('pui-theme',t);});
 hfBtn?.addEventListener('click',()=>{window.open(`${tRoot(S.taskPath)}hyperframes/index.html`,'_blank');});

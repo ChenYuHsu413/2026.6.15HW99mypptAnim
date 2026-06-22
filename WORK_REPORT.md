@@ -645,7 +645,9 @@ P3（打磨）
   ✅ 10. 收斂 scripts/ 副本 + hyperframes templates + 影子 pipeline-ui   ← 今日 part 5 ★
 ```
 
-`Last 大幅變動：2026-06-22（session 7：真 HF export → MP4、Preview-first UI reframe、`/apply` 收 `caption_style`、`/` redirect、SRT CRLF parser fix、preview-card overflow fix、播放期 timeline/badge 隱藏）`
+`Last 大幅變動：2026-06-22（session 8：PDF 上傳 null guard 修復、刪除 task 按鈕、旁白 auto_narration 自動化、切圖 merge-span 通用上限消 blob、per-deck seg_overrides.json + no_annot + 真不規則(irregular)切圖、PPTX 部署打包 requirements/Dockerfile/DEPLOY 但擱置）。詳見 §12。`
+
+`session 7（2026-06-22）：真 HF export → MP4、Preview-first UI reframe、`/apply` 收 `caption_style`、`/` redirect、SRT CRLF parser fix、preview-card overflow fix、播放期 timeline/badge 隱藏`
 
 之前：2026-06-20（session 6：切圖 v3 split + 兩 bbox + child fix + recursive + per-layer OCR v1/v2 + aspect ratio + 收斂副本 + Undo + per-layer start 重算 + forced-alignment 實機跑 + HF adapter stub 強化）
 
@@ -795,7 +797,98 @@ if isinstance(incoming.get("caption_style"), dict):
 
 ---
 
-## 12. 舊版第 9 點（保留作參考）
+## 12. Session 8 — PDF 上傳體驗修復 + 切圖通用化/真不規則 + 部署打包（2026-06-22）
+
+這個 session 回到「以 PDF 上傳為主」的使用體驗，修掉一個會讓 PDF 上傳整個壞掉的前端 bug，
+把旁白生成補成不會卡住的自動步驟，並針對使用者實際看到的切圖問題做了兩件事：一個**通用**的
+演算法修正（消除橫跨整張的 blob，對所有 deck 有效）+ 一套**per-deck** 的 `seg_overrides.json`
+微調機制（含真不規則切圖）。最後把 PPTX 部署打包寫好但**先擱置**（user 決定先專注 PDF）。
+
+### 12.1 PDF 上傳 bug 修復（前端 null guard）
+- 症狀：上傳 PDF 後跳 `Failed: Cannot set properties of null (setting 'innerHTML')`。
+- 根因：session 7 preview-first 重構把 `layerList` / `layerEdit` 等編輯節點設成 `null`，但
+  `showPendingTask()`（PDF 上傳後、還沒跑 pipeline 的 pending 畫面)仍直接 `layerList.innerHTML=''`、
+  `layerEdit.hidden=true`，沒有像第 359 行那樣加 `if(...)` guard。
+- 修：`pipeline-ui/app.js` 兩行補上 `if(layerList)` / `if(layerEdit)` guard（與既有模式一致）。
+
+### 12.2 刪除 task 按鈕（user 需求）
+- UI 下拉選單旁加 `🗑 刪除`（`index.html` + `app.js`，含 `confirm()` 二次確認、刪完自動刷新選單）。
+- 後端 `pipeline_server.py`：新增 `/delete-task` route → `delete_task()`（刪資料夾 + 從 task-index.json 移除）
+  + `_remove_from_task_index()`。**安全防護**：只允許刪 ROOT 底下、名稱以 `task=` 開頭的資料夾,
+  實測擋下 `task="."`（刪 ROOT）。
+
+### 12.3 旁白自動化（pipeline 不再卡在 narration missing）
+- `run_pipeline` 在 OCR 之後、TTS 之前插入 `auto_narration` in-process step：缺 `narration_script.md`
+  時自動用 OCR seed 一份草稿再繼續，pipeline 一律跑得完；已有旁白則跳過用 user 的。
+- `make_starter_narration` 改良：新增 `_clean_ocr_lines()` — 丟掉 footer 浮水印（模糊比對 `notebook`）、
+  單字碎片、純數字行（圖表刻度），並猜每張標題放進 `## Slide NN - 標題`。
+- **誠實結論（已跟 user 對齊）**：沒有 LLM 的 OCR 草稿品質有天花板（它不理解內容、只是文字片段堆疊），
+  規則救不回來。要好旁白只有三條路：**Claude 在 Claude Code 裡手寫(免費,需我在場)** / 後端接 LLM
+  API(要 key+費用) / user 自己在 UI 寫。User 沒有 API key → 結論是**旁白交給 Claude 手寫**,
+  OCR 自動草稿退回「沒有 LLM 時的最後備援」。
+
+### 12.4 task=test 手寫旁白
+- 直接讀 12 張投影片圖,寫了一份通順繁中 `narration_script.md`(標題/數字對齊投影片實際內容),
+  原 OCR 草稿備份到 `narration/narration_script.ocrdraft.bak.md`。重生 TTS/timeline/composition。
+
+### 12.5 切圖**通用**修正 — 消除「橫跨整張」的 blob
+- 問題:slide 06/09/10 把密集內容(金字塔、頭像環)整片併成一塊 `table`/`chart`,動畫只能整塊淡入。
+- 精準定位:`collage_cluster`(0.30)和 `detect_cards`(0.48)本來就有「整片就別合」上限,但
+  **`merge_pass` 和後面的 `absorb` 迴圈沒有** → blob 從那裡溜出來(slide 10 在 merge_pass、09 在 absorb)。
+- 修(`segment_elements.py`):新增 `spans_slide()`(both-dims > 0.78W × 0.6H)並**集中寫進 `absorb()`**
+  (回傳 bool,span 就拒絕)+ piece 階段的 merge_pass 也包一層;5 個 absorb 呼叫點全改成「成功才移除」,
+  只有 MAX_LAYERS 收尾那個 `guard=False` 放行(壓低層數優先)。
+- 驗證(task=test 12 張基準逐張比對):**9 張 byte-identical(零退步)**,06/09/10 的整張 blob 全消除。
+
+### 12.6 per-deck `seg_overrides.json` + `no_annot` + 真不規則(`irregular`)
+- **載入機制**:`segment_elements.py` 的 `OVERRIDES` 從空 dict 改成 `_load_seg_overrides()` 讀
+  `<task>/seg_overrides.json`(keyed by slide;沒檔就空,其他 deck 完全不受影響)。沿用切圖腳本**本來
+  就內建但一直空著**的 `apply_overrides`(merge/suppress/order),符合 pull 的 per-task JSON 慣例,
+  不再 fork 整支腳本。
+- **`no_annot` flag**:被指定的 chart/table 不要再自動把紅色標記抽成獨立 annotation 層(slide 10
+  金字塔的 tier 圖示就是這樣冒出來的)。
+- **`irregular` flag(真不規則切圖)**:開啟後圖層 alpha = 元素真實輪廓、四角透明,且**背景重建只挖
+  掉形狀**(不是整個矩形,保留周圍紙張紋理)。
+  - 第一版用墨水遮罩(深色|高彩度)→ 漏掉金字塔**淺灰底層**(灰 215、彩度 16,既不深也不飽和)。
+  - User 建議「邊緣偵測 + 連通判定同一區塊」。改成 **「跟紙張中位色差異 > 22 → 前景」+ close + 填補輪廓**:
+    淺色平面填色也算進同一區塊。四層金字塔(含灰底)完整切出。
+  - 每次都用「重組原圖 = 0 像素差」驗證,確保不規則 + 形狀背景填補沒破綻。
+- task=test slide 09 = 整張一塊;slide 10 = 三角形(真不規形、含灰底) + 四段文字各一塊,移除 arrow/annotation 雜訊。
+
+### 12.7 「為什麼切圖都是矩形」調查結論
+- 圖層匯出本來就是 RGBA、有 alpha 機制(支援不規則),但**預設只有 annotation 會套遮罩**,其餘
+  (chart/text/illustration…)走 `alpha=255` 不透明矩形(為了讓紙張紋理無縫接回:背景會把整個 bbox
+  填純色)。實測 task=test 各層 alpha 全 1.00 證實。**新舊版(git 6a86e82 vs 現在)這段邏輯一模一樣
+  —— 不是被改壞、也不是這次動到的**,是一直以來的預設。`irregular` flag 就是給需要時 opt-in。
+
+### 12.8 PPTX 部署打包(寫好,先擱置)
+- User 想支援 PPTX 上傳,並擔心「給別人用還要叫人裝 LibreOffice」。釐清:**轉檔是 server 端做的,
+  開瀏覽器的人不用裝;需要的只有跑 server 那台**。系統相依其實有兩個:LibreOffice(PPTX→PDF)+
+  ffmpeg/ffprobe(音長/render),都不是 pip 裝得到。
+- 新增檔案(惰性,不影響 PDF 流程):
+  - `requirements.txt` — 精確 7 個 Python 套件(pymupdf/opencv-python/numpy/Pillow/edge-tts/rapidocr/onnxruntime)。之前根本沒有。
+  - `Dockerfile` — `python:3.12-slim` + apt 裝 libreoffice + ffmpeg + fonts-noto-cjk + opencv 系統庫 + pip。一個 `docker run` 零手動安裝。
+  - `.dockerignore`、`DEPLOY.md`(Docker / 各 OS 直裝兩條路 + 掛 volume 持久化 + CJK 字型提醒)。
+  - `convert_pptx_to_pdf.py` 的「soffice not found」錯誤訊息改成指向 Docker/DEPLOY.md/「也可傳 PDF」。
+- User 選「每個人各自在本機跑」後,決定**先擱置 PPTX、以 PDF 為主**。Dockerfile 尚未實際 build。
+
+### 12.9 關鍵決策 / 取捨(帶去跟相關人確認需求用)
+- **旁白**:品質 vs 全自動 vs 免費,三者不可兼得。要全自動+好+給別人獨立用 → 必須後端接 LLM API(有費用)。
+- **PPTX**:server 端轉檔;「給別人各自跑」每台仍需 LibreOffice+ffmpeg,差別只在「Docker 一鍵 vs 照 DEPLOY.md 直裝」。
+
+### 12.10 驗證 summary
+- `node --check pipeline-ui/app.js` 過;`ast.parse` pipeline_server.py / segment_elements.py / convert_pptx_to_pdf.py 全過。
+- `/delete-task` 實測:guard 擋下刪 ROOT、正常刪 throwaway task + 同步移除 index。
+- 切圖修正:task=test 12 張對基準,9 張零退步、3 張 blob 消除。
+- 不規則切圖:task=test slide 10 重組原圖 = 0 像素差。
+- Server 收工前已停(背景 task)。
+
+> 本 session 未提交的本地狀態:`task=test/`、`task=test2/`(測試 deck 資料)與 `task-index.json` 留在
+> 本機不推送;推送的是程式 + 打包檔 + 文件。
+
+---
+
+## 13. 舊版第 9 點（保留作參考）
 
 ### 9.1 最自然的延續 — 切圖編輯 v3：Split
 - 用途：「這一塊應該切成兩塊」。
